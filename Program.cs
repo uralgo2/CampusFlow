@@ -172,6 +172,7 @@ app.UseSwaggerUI(options =>
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseStaticFiles();
 app.MapControllers();
 await DbInitializer.InitializeAsync(app.Services, app.Logger);
 
