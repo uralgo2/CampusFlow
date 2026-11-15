@@ -11,7 +11,7 @@ REST API и веб-интерфейс для бронирования аудит
 | Данные | EF Core 9, SQLite |
 | Аутентификация | JWT (HS256), Microsoft.IdentityModel.JsonWebTokens |
 | Документация | OpenAPI + Swagger UI (Swashbuckle) |
-| Frontend | HTML, CSS, JavaScript без сборки |
+| Frontend | HTML, CSS, JavaScript |
 | Тесты | 108 юнит-тестов на встроенном раннере |
 
 ## Требования
@@ -31,7 +31,6 @@ dotnet run
 | Веб-интерфейс | `http://localhost:5242/` |
 | Swagger UI | `http://localhost:5242/swagger` |
 | OpenAPI JSON | `http://localhost:5242/swagger/v1/swagger.json` |
-| Health check | `http://localhost:5242/health` |
 
 При первом запуске создаётся файл `campusflow.db` и загружаются seed-данные.
 
@@ -262,7 +261,7 @@ Content-Type: application/json
 
 ## Веб-интерфейс
 
-Доступен по адресу `http://localhost:5242/`. Отдаётся тем же приложением из папки `front`.
+Доступен по адресу `http://localhost:5242/`.
 
 - вход по логину и паролю, быстрый вход за `student1`, `student2`, `admin`;
 - вкладка «Аудитории»: фильтры по корпусу, вместимости и оборудованию, карточка аудитории,
