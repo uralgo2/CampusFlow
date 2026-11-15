@@ -161,6 +161,10 @@ app.UseStatusCodePages(async statusCodeContext =>
 
 app.UseCors();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseStaticFiles();
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
@@ -169,10 +173,12 @@ app.UseSwaggerUI(options =>
     options.DocumentTitle = "CampusFlow API";
 });
 
-app.UseAuthentication();
-app.UseAuthorization();
 
-app.UseStaticFiles();
+app.MapGet("/", (req) =>
+{
+    req.Response.Redirect("/index.html");
+    return Task.CompletedTask;
+});
 app.MapControllers();
 await DbInitializer.InitializeAsync(app.Services, app.Logger);
 

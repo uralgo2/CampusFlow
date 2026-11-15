@@ -280,3 +280,38 @@ body{background:radial-gradient(circle at 92% 2%,rgba(203,184,255,.13),transpare
 .room-actions .btn-danger{background:#fff0f1!important;color:#bd3451!important;box-shadow:none!important}
 @media(max-width:1100px){.room-admin-form{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:650px){.room-admin-form{grid-template-columns:repeat(2,minmax(0,1fr));padding:12px}.room-admin-form .field:nth-child(5),.room-admin-form .field:nth-child(6){grid-column:1/-1}.room-admin-actions{grid-column:1/-1;flex-wrap:wrap}.room-admin-actions .btn{flex:1}}
+/* ===== Свободные слоты в модалке бронирования ===== */
+.modal-free-slots{margin:6px 0 14px;padding:13px;background:#f8f5ff;border:1px solid #eee7fa;border-radius:11px}
+.free-slots-label{font-size:10px;font-weight:800;color:#817397;letter-spacing:.5px;margin-bottom:9px;text-transform:uppercase}
+.free-slots-list{display:flex;flex-wrap:wrap;gap:6px}
+.free-slot{padding:7px 11px;border:1px solid #d7c9f4;background:#fff;color:#4d19cc;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;transition:.15s}
+.free-slot:hover{background:#f0eaff;border-color:#bda4f1;transform:translateY(-1px)}
+.free-slot.active{background:#4d19cc;color:#fff;border-color:#4d19cc;box-shadow:0 4px 10px #4d19cc30}
+
+/* ===== Расширенная сетка фильтров (главная) ===== */
+.filters.filters-wide{grid-template-columns:1.1fr 1fr 1fr 1fr 1fr 1fr auto}
+@media(max-width:1100px){
+    .filters.filters-wide{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .filters.filters-wide .btn{grid-column:1/-1}
+}
+@media(max-width:760px){
+    .filters.filters-wide{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .filters.filters-wide .field:first-child{grid-column:1/-1}
+}
+@media(max-width:390px){
+    .filters.filters-wide{grid-template-columns:1fr}
+    .filters.filters-wide .field:first-child{grid-column:auto}
+}
+
+/* ===== Фильтры админ-панели и статистики ===== */
+.admin-filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:16px;padding:14px;background:#faf8ff;border:1px solid #eee7fa;border-radius:12px}
+.admin-filters .field{flex:1 1 140px;min-width:120px}
+.admin-filters .btn{flex:0 0 auto}
+
+/* ===== Компактный select для «Мои бронирования» ===== */
+.mini-select{height:36px;padding:0 11px;border:1px solid #e6def2;border-radius:9px;background:#fff;color:#4d327f;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+.mini-select:focus{outline:none;border-color:#9c7ae9;box-shadow:0 0 0 3px #4d19cc14}
+
+/* ===== Сводка в статистике (если API вернул плоские поля) ===== */
+#statsResult .stats{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+#statsResult .stat{text-transform:capitalize}
