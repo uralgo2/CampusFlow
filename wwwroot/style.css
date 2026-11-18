@@ -315,3 +315,28 @@ body{background:radial-gradient(circle at 92% 2%,rgba(203,184,255,.13),transpare
 /* ===== Сводка в статистике (если API вернул плоские поля) ===== */
 #statsResult .stats{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
 #statsResult .stat{text-transform:capitalize}
+
+.stats-result {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.stats-section {
+    min-width: 0;
+}
+
+.stats-section h3 {
+    margin: 0 0 14px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text, #202a35);
+}
+
+.stats-section .stats {
+    margin-bottom: 0;
+}
+
+.stats-section .table-wrap {
+    margin-top: 0;
+}

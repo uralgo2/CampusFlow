@@ -665,52 +665,140 @@ async function loadAdminStats() {
   toast(apiErrorMessage(err));
  }
 }
-const STAT_KEY_LABELS = {
- roomId: 'ID', roomName: 'Аудитория', name: 'Аудитория', building: 'Корпус',
- floor: 'Этаж', capacity: 'Мест',
- bookings: 'Броней', totalBookings: 'Броней', activeBookings: 'Активных',
- cancelledBookings: 'Отменено', totalMinutes: 'Минут',
- totalHours: 'Часов', hours: 'Часов',
- utilization: 'Загрузка', utilizationPercent: 'Загрузка %', load: 'Загрузка %',
- date: 'Дата', userDisplayName: 'Пользователь'
-};
+
+function formatHours(minutes) {
+ return `${(Number(minutes || 0) / 60).toFixed(1)} ч`;
+}
+
+function renderLoadBucket(load = {}) {
+ return {
+  active: Number(load.activeBookings || 0),
+  cancelled: Number(load.cancelledBookings || 0),
+  booked: Number(load.bookedMinutes || 0),
+  total: Number(load.totalMinutes || 0),
+  utilization: Number(load.utilizationPercent || 0)
+ };
+}
+
+function renderStatsTable(headers, rows) {
+ if (!rows.length) {
+  return '<div class="empty">Данных за выбранный период нет</div>';
+ }
+
+ return `
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr>
+                </thead>
+                <tbody>
+                    ${rows.join('')}
+                </tbody>
+            </table>
+        </div>`;
+}
+
 function renderAdminStats() {
  const container = $('statsResult');
+
  if (!adminStats) {
-  container.innerHTML = '<div class="empty">Выберите период и нажмите «Показать»</div>';
+  container.innerHTML =
+      '<div class="empty">Выберите период и нажмите «Показать»</div>';
   return;
  }
- const list = adminStats.rooms || adminStats.items || adminStats.byRoom || adminStats.rows || null;
 
- if (Array.isArray(list) && list.length > 0) {
-  const keys = Object.keys(list[0]);
-  const headers = keys.map(k => STAT_KEY_LABELS[k] || k);
-  const rows = list.map(item => `<tr>${keys.map(k => {
-   let v = item[k];
-   if (v == null) v = '—';
-   else if (k === 'utilization' || k === 'utilizationPercent' || k === 'load') {
-    if (typeof v === 'number') v = (v <= 1 ? (v * 100).toFixed(1) : v.toFixed(1)) + '%';
-   }
-   return `<td>${escapeHtml(v)}</td>`;
-  }).join('')}</tr>`).join('');
-  container.innerHTML = `<div class="table-wrap"><table>
-      <thead><tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead>
-      <tbody>${rows}</tbody></table></div>`;
- } else {
-  const entries = Object.entries(adminStats).filter(([k, v]) =>
-      v != null && typeof v !== 'object' && !Array.isArray(v));
-  if (!entries.length) {
-   container.innerHTML = '<div class="empty">Данных за период нет</div>';
-   return;
-  }
-  container.innerHTML = `<div class="stats">${entries.map(([k, v]) =>
-      `<div class="stat">
-        <div class="stat-label">${escapeHtml(STAT_KEY_LABELS[k] || k)}</div>
-        <div class="stat-value">${escapeHtml(v)}</div>
-      </div>`).join('')}</div>`;
- }
+ const totals = renderLoadBucket(adminStats.totals);
+
+ // Общие показатели за период
+ const totalsHtml = `
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">Активные бронирования</div>
+                <div class="stat-value">${totals.active}</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Отменённые бронирования</div>
+                <div class="stat-value">${totals.cancelled}</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Занятое время</div>
+                <div class="stat-value">${formatHours(totals.booked)}</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Загрузка аудиторий</div>
+                <div class="stat-value">${totals.utilization.toFixed(1)}%</div>
+            </div>
+        </div>`;
+
+ // Загрузка по дням
+ const dailyRows = (adminStats.byDay || []).map(item => {
+  const load = renderLoadBucket(item.load);
+
+  return `<tr>
+            <td>${escapeHtml(item.date)}</td>
+            <td>${load.active}</td>
+            <td>${load.cancelled}</td>
+            <td>${formatHours(load.booked)}</td>
+            <td>${load.utilization.toFixed(1)}%</td>
+        </tr>`;
+ });
+
+ // Загрузка по корпусам
+ const buildingRows = (adminStats.byBuilding || []).map(item => {
+  const load = renderLoadBucket(item.load);
+
+  return `<tr>
+            <td>${escapeHtml(item.building)}</td>
+            <td>${Number(item.rooms || 0)}</td>
+            <td>${load.active}</td>
+            <td>${formatHours(load.booked)}</td>
+            <td>${load.utilization.toFixed(1)}%</td>
+        </tr>`;
+ });
+
+ // Самые загруженные аудитории
+ const roomRows = (adminStats.topRooms || []).map(item => `
+        <tr>
+            <td>${escapeHtml(item.roomName)}</td>
+            <td>${escapeHtml(item.building)}</td>
+            <td>${Number(item.activeBookings || 0)}</td>
+            <td>${formatHours(item.bookedMinutes)}</td>
+        </tr>`);
+
+ container.innerHTML = `
+        <div class="stats-section">
+            <h3>Общая статистика</h3>
+            ${totalsHtml}
+        </div>
+
+        <div class="stats-section">
+            <h3>Загрузка по дням</h3>
+            ${renderStatsTable(
+     ['Дата', 'Активные брони', 'Отменённые', 'Занятое время', 'Загрузка'],
+     dailyRows
+ )}
+        </div>
+
+        <div class="stats-section">
+            <h3>Загрузка по корпусам</h3>
+            ${renderStatsTable(
+     ['Корпус', 'Аудиторий', 'Активные брони', 'Занятое время', 'Загрузка'],
+     buildingRows
+ )}
+        </div>
+
+        <div class="stats-section">
+            <h3>Самые загруженные аудитории</h3>
+            ${renderStatsTable(
+     ['Аудитория', 'Корпус', 'Активные брони', 'Занятое время'],
+     roomRows
+ )}
+        </div>
+    `;
 }
+
 $('statsLoadBtn').addEventListener('click', loadAdminStats);
+
 
 /* ---------- вспомогательные ---------- */
 function updateBuildingStats() {
