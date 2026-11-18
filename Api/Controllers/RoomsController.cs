@@ -15,7 +15,10 @@ public sealed class RoomsController : ControllerBase
 {
     private readonly IRoomService _rooms;
 
-    public RoomsController(IRoomService rooms) => _rooms = rooms;
+    public RoomsController(IRoomService rooms)
+    {
+        _rooms = rooms;
+    }
 
     /// <summary>Список аудиторий с фильтрами по корпусу, вместимости и оборудованию.</summary>
     /// <param name="building">Корпус: A, B, C или D.</param>
@@ -31,8 +34,10 @@ public sealed class RoomsController : ControllerBase
         [FromQuery] string? building,
         [FromQuery] int? minCapacity,
         [FromQuery] string? equipment,
-        CancellationToken cancellationToken) =>
-        Ok(await _rooms.GetRoomsAsync(building, minCapacity, equipment, cancellationToken));
+        CancellationToken cancellationToken)
+    {
+        return Ok(await _rooms.GetRoomsAsync(building, minCapacity, equipment, cancellationToken));
+    }
 
     /// <summary>Карточка аудитории.</summary>
     /// <response code="200">Аудитория.</response>
@@ -40,8 +45,10 @@ public sealed class RoomsController : ControllerBase
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(RoomDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<RoomDto>> GetRoom(int id, CancellationToken cancellationToken) =>
-        Ok(await _rooms.GetRoomAsync(id, cancellationToken));
+    public async Task<ActionResult<RoomDto>> GetRoom(int id, CancellationToken cancellationToken)
+    {
+        return Ok(await _rooms.GetRoomAsync(id, cancellationToken));
+    }
 
     /// <summary>Свободные слоты аудитории на дату: рабочий день 09:00–18:00, сетка 30 минут.</summary>
     /// <param name="id">Идентификатор аудитории.</param>
@@ -57,11 +64,13 @@ public sealed class RoomsController : ControllerBase
     public async Task<ActionResult<FreeSlotsResponse>> GetFreeSlots(
         int id,
         [FromQuery] string? date,
-        CancellationToken cancellationToken) =>
-        Ok(await _rooms.GetFreeSlotsAsync(id, date, cancellationToken));
+        CancellationToken cancellationToken)
+    {
+        return Ok(await _rooms.GetFreeSlotsAsync(id, date, cancellationToken));
+    }
 
     /// <summary>
-    /// Аудитории, свободные на заданный интервал, с фильтрами по корпусу, вместимости и оборудованию.
+    ///     Аудитории, свободные на заданный интервал, с фильтрами по корпусу, вместимости и оборудованию.
     /// </summary>
     /// <response code="200">Подходящие свободные аудитории.</response>
     /// <response code="400">Неверные дата, время или фильтры.</response>
@@ -75,6 +84,9 @@ public sealed class RoomsController : ControllerBase
         [FromQuery] string? building,
         [FromQuery] int? minCapacity,
         [FromQuery] string? equipment,
-        CancellationToken cancellationToken) =>
-        Ok(await _rooms.FindFreeRoomsAsync(date, startTime, endTime, building, minCapacity, equipment, cancellationToken));
+        CancellationToken cancellationToken)
+    {
+        return Ok(await _rooms.FindFreeRoomsAsync(date, startTime, endTime, building, minCapacity, equipment,
+            cancellationToken));
+    }
 }

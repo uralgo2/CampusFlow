@@ -4,9 +4,9 @@ using System.Reflection;
 namespace CampusFlow.Tests.Testing;
 
 /// <summary>
-/// Мини-раннер юнит-тестов: находит все методы с <see cref="TestAttribute"/> и выполняет их.
-/// Используется вместо xunit, потому что пакеты xunit в этом окружении недоступны без сети;
-/// структура тестов (атрибут + Assert) повторяет xunit, поэтому перейти на него не составит труда.
+///     Мини-раннер юнит-тестов: находит все методы с <see cref="TestAttribute" /> и выполняет их.
+///     Используется вместо xunit, потому что пакеты xunit в этом окружении недоступны без сети;
+///     структура тестов (атрибут + Assert) повторяет xunit, поэтому перейти на него не составит труда.
 /// </summary>
 public static class TestRunner
 {
@@ -48,10 +48,7 @@ public static class TestRunner
                                    $"Не удалось создать экземпляр {test.Type.Name}: нужен конструктор без параметров.");
 
                 var result = test.Method.Invoke(instance, null);
-                if (result is Task task)
-                {
-                    task.GetAwaiter().GetResult();
-                }
+                if (result is Task task) task.GetAwaiter().GetResult();
 
                 passed++;
                 Console.WriteLine($"    PASS  {displayName} ({testStopwatch.ElapsedMilliseconds} мс)");
@@ -66,19 +63,14 @@ public static class TestRunner
         }
 
         Console.WriteLine();
-        Console.WriteLine($"Итого: {tests.Count}, прошло {passed}, упало {failures.Count}, время {stopwatch.ElapsedMilliseconds} мс");
+        Console.WriteLine(
+            $"Итого: {tests.Count}, прошло {passed}, упало {failures.Count}, время {stopwatch.ElapsedMilliseconds} мс");
 
-        if (failures.Count == 0)
-        {
-            return 0;
-        }
+        if (failures.Count == 0) return 0;
 
         Console.WriteLine();
         Console.WriteLine("Проваленные тесты:");
-        foreach (var failure in failures)
-        {
-            Console.WriteLine($"  - {failure}");
-        }
+        foreach (var failure in failures) Console.WriteLine($"  - {failure}");
 
         return 1;
     }
@@ -89,14 +81,10 @@ public static class TestRunner
         {
             var argument = args[index];
             if (argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))
-            {
                 return argument["--filter=".Length..];
-            }
 
             if (string.Equals(argument, "--filter", StringComparison.OrdinalIgnoreCase) && index + 1 < args.Length)
-            {
                 return args[index + 1];
-            }
         }
 
         return null;
@@ -108,29 +96,19 @@ public static class TestRunner
 
         foreach (var type in typeof(TestRunner).Assembly.GetTypes())
         {
-            if (!type.IsClass || type.IsAbstract || type.IsGenericTypeDefinition)
-            {
-                continue;
-            }
+            if (!type.IsClass || type.IsAbstract || type.IsGenericTypeDefinition) continue;
 
-            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance |
+                                                   BindingFlags.DeclaredOnly))
             {
-                if (method.GetCustomAttribute<TestAttribute>() is null)
-                {
-                    continue;
-                }
+                if (method.GetCustomAttribute<TestAttribute>() is null) continue;
 
                 if (method.GetParameters().Length > 0)
-                {
                     throw new InvalidOperationException(
                         $"Тестовый метод {type.Name}.{method.Name} не должен принимать параметры.");
-                }
 
                 var fullName = $"{type.Name}.{method.Name}";
-                if (filter is not null && !fullName.Contains(filter, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
+                if (filter is not null && !fullName.Contains(filter, StringComparison.OrdinalIgnoreCase)) continue;
 
                 tests.Add(new TestCase(type, method));
             }

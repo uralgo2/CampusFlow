@@ -9,7 +9,10 @@ public sealed class UserRepository : IUserRepository
 {
     private readonly CampusFlowDbContext _db;
 
-    public UserRepository(CampusFlowDbContext db) => _db = db;
+    public UserRepository(CampusFlowDbContext db)
+    {
+        _db = db;
+    }
 
     /// <inheritdoc />
     public Task<User?> GetByLoginAsync(string login, CancellationToken cancellationToken)
@@ -21,6 +24,8 @@ public sealed class UserRepository : IUserRepository
     }
 
     /// <inheritdoc />
-    public Task<User?> GetByIdAsync(int id, CancellationToken cancellationToken) =>
-        _db.Users.AsNoTracking().FirstOrDefaultAsync(user => user.Id == id, cancellationToken);
+    public Task<User?> GetByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        return _db.Users.AsNoTracking().FirstOrDefaultAsync(user => user.Id == id, cancellationToken);
+    }
 }

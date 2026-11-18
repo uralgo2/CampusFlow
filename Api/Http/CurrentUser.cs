@@ -10,7 +10,10 @@ public sealed class CurrentUser : ICurrentUser
 {
     private readonly IHttpContextAccessor _accessor;
 
-    public CurrentUser(IHttpContextAccessor accessor) => _accessor = accessor;
+    public CurrentUser(IHttpContextAccessor accessor)
+    {
+        _accessor = accessor;
+    }
 
     private ClaimsPrincipal? Principal => _accessor.HttpContext?.User;
 
@@ -32,7 +35,10 @@ public sealed class CurrentUser : ICurrentUser
     public bool IsAdmin => Role == UserRole.Admin;
 
     /// <inheritdoc />
-    public int RequireUserId() => UserId ?? throw ApiException.Unauthorized();
+    public int RequireUserId()
+    {
+        return UserId ?? throw ApiException.Unauthorized();
+    }
 }
 
 public static class AuthClaimTypes

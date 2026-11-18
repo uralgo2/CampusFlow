@@ -1,15 +1,14 @@
 using CampusFlow.Api.Http;
 using CampusFlow.Application.Errors;
 using CampusFlow.Contracts.Common;
-using Microsoft.AspNetCore.Http;
 
 namespace CampusFlow.Api.Middleware;
 
 /// <summary>Превращает исключения приложения в единый JSON-ответ об ошибке.</summary>
 public sealed class ExceptionHandlingMiddleware
 {
-    private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+    private readonly RequestDelegate _next;
 
     public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
     {
@@ -67,10 +66,7 @@ public sealed class ExceptionHandlingMiddleware
                 context.Request.Method,
                 context.Request.Path));
 
-            if (context.Response.HasStarted)
-            {
-                throw;
-            }
+            if (context.Response.HasStarted) throw;
 
             await HttpErrorWriter.WriteAsync(
                 context,
@@ -80,8 +76,8 @@ public sealed class ExceptionHandlingMiddleware
     }
 
     /// <summary>
-    /// Выполняет запись в журнал, не позволяя ошибке логирования выбросить исключение
-    /// и прервать уже формируемый HTTP-ответ.
+    ///     Выполняет запись в журнал, не позволяя ошибке логирования выбросить исключение
+    ///     и прервать уже формируемый HTTP-ответ.
     /// </summary>
     private static void LogSafely(Action logAction)
     {

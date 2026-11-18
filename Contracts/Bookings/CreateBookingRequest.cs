@@ -1,7 +1,7 @@
 namespace CampusFlow.Contracts.Bookings;
 
 /// <summary>
-/// Создание брони. Автор берётся из токена, поэтому <c>userId</c> в теле не принимается.
+///     Создание брони. Автор берётся из токена, поэтому <c>userId</c> в теле не принимается.
 /// </summary>
 /// <param name="RoomId">Идентификатор аудитории.</param>
 /// <param name="Date">Дата, <c>YYYY-MM-DD</c>, не в прошлом.</param>

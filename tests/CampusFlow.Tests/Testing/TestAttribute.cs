@@ -8,7 +8,10 @@ public sealed class TestAttribute : Attribute
     {
     }
 
-    public TestAttribute(string displayName) => DisplayName = displayName;
+    public TestAttribute(string displayName)
+    {
+        DisplayName = displayName;
+    }
 
     /// <summary>Необязательное имя для вывода в консоли.</summary>
     public string? DisplayName { get; }

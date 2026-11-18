@@ -6,7 +6,8 @@ namespace CampusFlow.Application.Services;
 public interface IStatsService
 {
     /// <summary>
-    /// Загрузка по дням, корпусам и аудиториям за период. По умолчанию — ближайшая неделя, начиная с сегодня.
+    ///     Загрузка по дням, корпусам и аудиториям за период. По умолчанию — ближайшая неделя, начиная с сегодня.
     /// </summary>
-    Task<AdminStatsResponse> GetStatsAsync(string? from, string? to, string? building, CancellationToken cancellationToken);
+    Task<AdminStatsResponse> GetStatsAsync(string? from, string? to, string? building,
+        CancellationToken cancellationToken);
 }

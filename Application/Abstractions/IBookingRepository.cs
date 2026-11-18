@@ -5,7 +5,7 @@ namespace CampusFlow.Application.Abstractions;
 /// <summary>Хранилище броней.</summary>
 public interface IBookingRepository
 {
-    /// <summary>Брони аудитории на дату; при <paramref name="activeOnly"/> отменённые не возвращаются.</summary>
+    /// <summary>Брони аудитории на дату; при <paramref name="activeOnly" /> отменённые не возвращаются.</summary>
     Task<IReadOnlyList<Booking>> ListForRoomAndDateAsync(
         int roomId,
         DateOnly date,
@@ -13,7 +13,8 @@ public interface IBookingRepository
         CancellationToken cancellationToken);
 
     /// <summary>Брони пользователя с необязательным фильтром по статусу.</summary>
-    Task<IReadOnlyList<Booking>> ListForUserAsync(int userId, BookingStatus? status, CancellationToken cancellationToken);
+    Task<IReadOnlyList<Booking>> ListForUserAsync(int userId, BookingStatus? status,
+        CancellationToken cancellationToken);
 
     /// <summary>Брони с произвольными фильтрами (админ-просмотр), отсортированные по дате и времени.</summary>
     Task<IReadOnlyList<Booking>> ListAsync(BookingQuery query, CancellationToken cancellationToken);

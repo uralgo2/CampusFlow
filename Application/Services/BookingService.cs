@@ -14,16 +14,16 @@ namespace CampusFlow.Application.Services;
 public sealed class BookingService : IBookingService
 {
     /// <summary>
-    /// Проверка конфликта и вставка выполняются под этим замком, чтобы два одновременных запроса
-    /// не создали пересекающиеся брони. Для MVP с SQLite этого достаточно.
+    ///     Проверка конфликта и вставка выполняются под этим замком, чтобы два одновременных запроса
+    ///     не создали пересекающиеся брони. Для MVP с SQLite этого достаточно.
     /// </summary>
     private static readonly SemaphoreSlim CreateLock = new(1, 1);
 
     private readonly IBookingRepository _bookings;
-    private readonly IRoomRepository _rooms;
-    private readonly ICurrentUser _currentUser;
     private readonly IClock _clock;
+    private readonly ICurrentUser _currentUser;
     private readonly ILogger<BookingService> _logger;
+    private readonly IRoomRepository _rooms;
 
     public BookingService(
         IBookingRepository bookings,
@@ -44,15 +44,10 @@ public sealed class BookingService : IBookingService
     {
         var userId = _currentUser.RequireUserId();
 
-        if (request is null)
-        {
-            throw ApiException.Validation("body", "Тело запроса обязательно");
-        }
+        if (request is null) throw ApiException.Validation("body", "Тело запроса обязательно");
 
         if (request.RoomId is null or <= 0)
-        {
             throw ApiException.Validation("roomId", "Поле roomId обязательно и должно быть больше 0");
-        }
 
         var roomId = request.RoomId.Value;
         var (date, start, end) = SlotParser.Parse(_clock.Today, request.Date, request.StartTime, request.EndTime);
@@ -68,13 +63,11 @@ public sealed class BookingService : IBookingService
         {
             var hasConflict = await _bookings.HasConflictAsync(roomId, date, start, end, null, cancellationToken);
             if (hasConflict)
-            {
                 throw ApiException.BookingConflict(
                     roomId,
                     ApiParsing.FormatDate(date),
                     ApiParsing.FormatTime(start),
                     ApiParsing.FormatTime(end));
-            }
 
             var booking = new Booking
             {
@@ -134,15 +127,9 @@ public sealed class BookingService : IBookingService
         var booking = await _bookings.GetAsync(bookingId, cancellationToken)
                       ?? throw ApiException.BookingNotFound(bookingId);
 
-        if (booking.UserId != userId)
-        {
-            throw ApiException.Forbidden("Отменить можно только свою бронь");
-        }
+        if (booking.UserId != userId) throw ApiException.Forbidden("Отменить можно только свою бронь");
 
-        if (booking.Status == BookingStatus.Cancelled)
-        {
-            throw ApiException.AlreadyCancelled(bookingId);
-        }
+        if (booking.Status == BookingStatus.Cancelled) throw ApiException.AlreadyCancelled(bookingId);
 
         booking.Status = BookingStatus.Cancelled;
         await _bookings.SaveAsync(cancellationToken);
@@ -171,10 +158,7 @@ public sealed class BookingService : IBookingService
         var booking = await _bookings.GetAsync(bookingId, cancellationToken)
                       ?? throw ApiException.BookingNotFound(bookingId);
 
-        if (booking.Status == BookingStatus.Cancelled)
-        {
-            throw ApiException.AlreadyCancelled(bookingId);
-        }
+        if (booking.Status == BookingStatus.Cancelled) throw ApiException.AlreadyCancelled(bookingId);
 
         booking.Status = BookingStatus.Cancelled;
         await _bookings.SaveAsync(cancellationToken);
@@ -224,15 +208,10 @@ public sealed class BookingService : IBookingService
 
     private static BookingStatus? ParseStatusOrNull(string? status)
     {
-        if (string.IsNullOrWhiteSpace(status))
-        {
-            return null;
-        }
+        if (string.IsNullOrWhiteSpace(status)) return null;
 
         if (!BookingStatuses.TryParse(status, out var parsed))
-        {
             throw ApiException.Validation("status", "Допустимые значения: active, cancelled");
-        }
 
         return parsed;
     }
@@ -245,42 +224,25 @@ public sealed class BookingService : IBookingService
         if (!string.IsNullOrWhiteSpace(date))
         {
             if (ApiParsing.TryParseDate(date, out var value))
-            {
                 parsedDate = value;
-            }
             else
-            {
                 errors["date"] = "Неверный формат даты, ожидается YYYY-MM-DD";
-            }
         }
 
-        if (roomId is <= 0)
-        {
-            errors["roomId"] = "Параметр roomId должен быть положительным";
-        }
+        if (roomId is <= 0) errors["roomId"] = "Параметр roomId должен быть положительным";
 
-        if (userId is <= 0)
-        {
-            errors["userId"] = "Параметр userId должен быть положительным";
-        }
+        if (userId is <= 0) errors["userId"] = "Параметр userId должен быть положительным";
 
         BookingStatus? parsedStatus = null;
         if (!string.IsNullOrWhiteSpace(status))
         {
             if (BookingStatuses.TryParse(status, out var value))
-            {
                 parsedStatus = value;
-            }
             else
-            {
                 errors["status"] = "Допустимые значения: active, cancelled";
-            }
         }
 
-        if (errors.Count > 0)
-        {
-            throw ApiException.Validation(errors);
-        }
+        if (errors.Count > 0) throw ApiException.Validation(errors);
 
         return new BookingQuery(parsedDate, roomId, userId, parsedStatus);
     }
@@ -288,18 +250,16 @@ public sealed class BookingService : IBookingService
     private static string? NormalizeComment(string? comment)
     {
         var normalized = ApiParsing.NormalizeOptional(comment);
-        if (normalized is null)
-        {
-            return null;
-        }
+        if (normalized is null) return null;
 
         if (normalized.Length > 500)
-        {
             throw ApiException.Validation("comment", "Комментарий не должен быть длиннее 500 символов");
-        }
 
         return normalized;
     }
 
-    private static string EscapeCsv(string value) => $"\"{value.Replace("\"", "\"\"")}\"";
+    private static string EscapeCsv(string value)
+    {
+        return $"\"{value.Replace("\"", "\"\"")}\"";
+    }
 }

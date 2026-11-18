@@ -1,4 +1,3 @@
-
 {
   "users": [
     {
@@ -27,7 +26,10 @@
       "building": "A",
       "floor": 1,
       "capacity": 30,
-      "equipment": ["Projector", "Whiteboard"]
+      "equipment": [
+        "Projector",
+        "Whiteboard"
+      ]
     },
     {
       "id": 2,
@@ -35,7 +37,9 @@
       "building": "A",
       "floor": 1,
       "capacity": 20,
-      "equipment": ["Whiteboard"]
+      "equipment": [
+        "Whiteboard"
+      ]
     },
     {
       "id": 3,
@@ -43,7 +47,10 @@
       "building": "A",
       "floor": 2,
       "capacity": 15,
-      "equipment": ["Computers", "Projector"]
+      "equipment": [
+        "Computers",
+        "Projector"
+      ]
     },
     {
       "id": 4,
@@ -51,7 +58,10 @@
       "building": "B",
       "floor": 1,
       "capacity": 40,
-      "equipment": ["Projector", "Audio"]
+      "equipment": [
+        "Projector",
+        "Audio"
+      ]
     },
     {
       "id": 5,
@@ -59,7 +69,11 @@
       "building": "B",
       "floor": 2,
       "capacity": 25,
-      "equipment": ["Projector", "Whiteboard", "Audio"]
+      "equipment": [
+        "Projector",
+        "Whiteboard",
+        "Audio"
+      ]
     },
     {
       "id": 6,
@@ -67,7 +81,9 @@
       "building": "B",
       "floor": 3,
       "capacity": 10,
-      "equipment": ["Whiteboard"]
+      "equipment": [
+        "Whiteboard"
+      ]
     },
     {
       "id": 7,
@@ -75,7 +91,11 @@
       "building": "C",
       "floor": 1,
       "capacity": 50,
-      "equipment": ["Projector", "Audio", "Video"]
+      "equipment": [
+        "Projector",
+        "Audio",
+        "Video"
+      ]
     },
     {
       "id": 8,
@@ -83,7 +103,9 @@
       "building": "C",
       "floor": 2,
       "capacity": 35,
-      "equipment": ["Computers"]
+      "equipment": [
+        "Computers"
+      ]
     },
     {
       "id": 9,
@@ -91,7 +113,10 @@
       "building": "C",
       "floor": 3,
       "capacity": 12,
-      "equipment": ["Whiteboard", "Projector"]
+      "equipment": [
+        "Whiteboard",
+        "Projector"
+      ]
     },
     {
       "id": 10,
@@ -99,7 +124,11 @@
       "building": "D",
       "floor": 1,
       "capacity": 60,
-      "equipment": ["Projector", "Audio", "Video"]
+      "equipment": [
+        "Projector",
+        "Audio",
+        "Video"
+      ]
     },
     {
       "id": 11,
@@ -107,7 +136,9 @@
       "building": "D",
       "floor": 2,
       "capacity": 18,
-      "equipment": ["Whiteboard"]
+      "equipment": [
+        "Whiteboard"
+      ]
     },
     {
       "id": 12,
@@ -115,7 +146,10 @@
       "building": "D",
       "floor": 3,
       "capacity": 24,
-      "equipment": ["Projector", "Computers"]
+      "equipment": [
+        "Projector",
+        "Computers"
+      ]
     }
   ],
   "bookings": [

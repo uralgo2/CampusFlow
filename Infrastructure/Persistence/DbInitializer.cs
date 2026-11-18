@@ -1,5 +1,4 @@
 using CampusFlow.Application.Abstractions;
-using CampusFlow.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace CampusFlow.Infrastructure.Persistence;
@@ -8,11 +7,12 @@ namespace CampusFlow.Infrastructure.Persistence;
 public static class DbInitializer
 {
     /// <summary>
-    /// Создаёт схему SQLite (если её нет) и заполняет её тестовыми данными, когда таблица пользователей пуста.
-    /// Параметр конфигурации <c>Seed:RecreateOnStartup=true</c> пересоздаёт базу на каждом старте — так даты
-    /// сидов всегда актуальны на день демонстрации.
+    ///     Создаёт схему SQLite (если её нет) и заполняет её тестовыми данными, когда таблица пользователей пуста.
+    ///     Параметр конфигурации <c>Seed:RecreateOnStartup=true</c> пересоздаёт базу на каждом старте — так даты
+    ///     сидов всегда актуальны на день демонстрации.
     /// </summary>
-    public static async Task InitializeAsync(IServiceProvider services, ILogger logger, CancellationToken cancellationToken = default)
+    public static async Task InitializeAsync(IServiceProvider services, ILogger logger,
+        CancellationToken cancellationToken = default)
     {
         await using var scope = services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<CampusFlowDbContext>();

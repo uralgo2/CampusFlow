@@ -1,8 +1,8 @@
 namespace CampusFlow.Domain;
 
 /// <summary>
-/// Бронь аудитории на конкретную дату и интервал времени. Интервал полуоткрытый: <c>[StartTime, EndTime)</c>,
-/// поэтому «встык» (15:00 конец и 15:00 начало) конфликтом не считается.
+///     Бронь аудитории на конкретную дату и интервал времени. Интервал полуоткрытый: <c>[StartTime, EndTime)</c>,
+///     поэтому «встык» (15:00 конец и 15:00 начало) конфликтом не считается.
 /// </summary>
 public sealed class Booking
 {
@@ -28,9 +28,11 @@ public sealed class Booking
     public string? Comment { get; set; }
 
     /// <summary>
-    /// Пересекается ли действующая бронь с интервалом <paramref name="start"/>/<paramref name="end"/>.
-    /// Касание границ пересечением не является.
+    ///     Пересекается ли действующая бронь с интервалом <paramref name="start" />/<paramref name="end" />.
+    ///     Касание границ пересечением не является.
     /// </summary>
-    public bool Overlaps(TimeOnly start, TimeOnly end) =>
-        Status == BookingStatus.Active && StartTime < end && start < EndTime;
+    public bool Overlaps(TimeOnly start, TimeOnly end)
+    {
+        return Status == BookingStatus.Active && StartTime < end && start < EndTime;
+    }
 }

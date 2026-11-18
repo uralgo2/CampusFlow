@@ -16,7 +16,10 @@ public sealed class AdminRoomsController : ControllerBase
 {
     private readonly IRoomService _rooms;
 
-    public AdminRoomsController(IRoomService rooms) => _rooms = rooms;
+    public AdminRoomsController(IRoomService rooms)
+    {
+        _rooms = rooms;
+    }
 
     /// <summary>Создать аудиторию.</summary>
     /// <response code="201">Аудитория создана.</response>
@@ -47,8 +50,10 @@ public sealed class AdminRoomsController : ControllerBase
     public async Task<ActionResult<RoomDto>> Update(
         int id,
         [FromBody] UpdateRoomRequest? request,
-        CancellationToken cancellationToken) =>
-        Ok(await _rooms.UpdateRoomAsync(id, request, cancellationToken));
+        CancellationToken cancellationToken)
+    {
+        return Ok(await _rooms.UpdateRoomAsync(id, request, cancellationToken));
+    }
 
     /// <summary>Удалить аудиторию. Аудиторию с действующими бронями удалить нельзя.</summary>
     /// <response code="204">Аудитория удалена.</response>

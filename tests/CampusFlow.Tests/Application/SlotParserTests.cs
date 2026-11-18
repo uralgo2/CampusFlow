@@ -1,7 +1,5 @@
 using CampusFlow.Application.Errors;
-using CampusFlow.Application.Parsing;
 using CampusFlow.Application.Validation;
-using CampusFlow.Domain;
 using CampusFlow.Tests.Testing;
 using static CampusFlow.Tests.Testing.Assert;
 
@@ -42,15 +40,19 @@ public sealed class SlotParserTests
     [Test]
     public void Parse_TimesOutsideGrid_AreRejected()
     {
-        ThrowsApiError(() => SlotParser.Parse(Fixtures.Today, Fixtures.Tomorrow(), "14:10", "15:10"), 400, ErrorCodes.Validation);
-        ThrowsApiError(() => SlotParser.Parse(Fixtures.Today, Fixtures.Tomorrow(), "14:00", "15:10"), 400, ErrorCodes.Validation);
+        ThrowsApiError(() => SlotParser.Parse(Fixtures.Today, Fixtures.Tomorrow(), "14:10", "15:10"), 400,
+            ErrorCodes.Validation);
+        ThrowsApiError(() => SlotParser.Parse(Fixtures.Today, Fixtures.Tomorrow(), "14:00", "15:10"), 400,
+            ErrorCodes.Validation);
     }
 
     [Test]
     public void Parse_TimesOutsideWorkingDay_AreRejected()
     {
-        ThrowsApiError(() => SlotParser.Parse(Fixtures.Today, Fixtures.Tomorrow(), "08:30", "09:30"), 400, ErrorCodes.Validation);
-        ThrowsApiError(() => SlotParser.Parse(Fixtures.Today, Fixtures.Tomorrow(), "17:30", "18:30"), 400, ErrorCodes.Validation);
+        ThrowsApiError(() => SlotParser.Parse(Fixtures.Today, Fixtures.Tomorrow(), "08:30", "09:30"), 400,
+            ErrorCodes.Validation);
+        ThrowsApiError(() => SlotParser.Parse(Fixtures.Today, Fixtures.Tomorrow(), "17:30", "18:30"), 400,
+            ErrorCodes.Validation);
     }
 
     [Test]
@@ -79,9 +81,12 @@ public sealed class SlotParserTests
     [Test]
     public void Parse_BadFormats_AreRejected()
     {
-        ThrowsApiError(() => SlotParser.Parse(Fixtures.Today, "15.11.2026", "10:00", "11:00"), 400, ErrorCodes.Validation);
-        ThrowsApiError(() => SlotParser.Parse(Fixtures.Today, Fixtures.Tomorrow(), "10:00:00", "11:00"), 400, ErrorCodes.Validation);
-        ThrowsApiError(() => SlotParser.Parse(Fixtures.Today, Fixtures.Tomorrow(), "десять", "11:00"), 400, ErrorCodes.Validation);
+        ThrowsApiError(() => SlotParser.Parse(Fixtures.Today, "15.11.2026", "10:00", "11:00"), 400,
+            ErrorCodes.Validation);
+        ThrowsApiError(() => SlotParser.Parse(Fixtures.Today, Fixtures.Tomorrow(), "10:00:00", "11:00"), 400,
+            ErrorCodes.Validation);
+        ThrowsApiError(() => SlotParser.Parse(Fixtures.Today, Fixtures.Tomorrow(), "десять", "11:00"), 400,
+            ErrorCodes.Validation);
     }
 
     [Test]
@@ -98,7 +103,8 @@ public sealed class SlotParserTests
         ThrowsApiError(() => SlotParser.ParseDate(Fixtures.Today, null), 400, ErrorCodes.Validation);
         ThrowsApiError(() => SlotParser.ParseDate(Fixtures.Today, ""), 400, ErrorCodes.Validation);
         ThrowsApiError(() => SlotParser.ParseDate(Fixtures.Today, "2026-13-40"), 400, ErrorCodes.Validation);
-        ThrowsApiError(() => SlotParser.ParseDate(Fixtures.Today, Fixtures.Iso(Fixtures.Today.AddDays(-1))), 400, ErrorCodes.Validation);
+        ThrowsApiError(() => SlotParser.ParseDate(Fixtures.Today, Fixtures.Iso(Fixtures.Today.AddDays(-1))), 400,
+            ErrorCodes.Validation);
     }
 
     [Test]

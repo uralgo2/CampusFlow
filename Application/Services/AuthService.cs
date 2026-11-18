@@ -8,9 +8,9 @@ namespace CampusFlow.Application.Services;
 /// <inheritdoc />
 public sealed class AuthService : IAuthService
 {
-    private readonly IUserRepository _users;
-    private readonly ITokenService _tokens;
     private readonly ICurrentUser _currentUser;
+    private readonly ITokenService _tokens;
+    private readonly IUserRepository _users;
 
     public AuthService(IUserRepository users, ITokenService tokens, ICurrentUser currentUser)
     {
@@ -26,28 +26,17 @@ public sealed class AuthService : IAuthService
         var login = request?.Login?.Trim();
         var password = request?.Password;
 
-        if (string.IsNullOrEmpty(login))
-        {
-            errors["login"] = "Поле login обязательно";
-        }
+        if (string.IsNullOrEmpty(login)) errors["login"] = "Поле login обязательно";
 
-        if (string.IsNullOrEmpty(password))
-        {
-            errors["password"] = "Поле password обязательно";
-        }
+        if (string.IsNullOrEmpty(password)) errors["password"] = "Поле password обязательно";
 
-        if (errors.Count > 0)
-        {
-            throw ApiException.Validation(errors);
-        }
+        if (errors.Count > 0) throw ApiException.Validation(errors);
 
         var user = await _users.GetByLoginAsync(login!, cancellationToken);
 
         // MVP: пароль совпадает с логином, отдельного хранилища паролей нет.
         if (user is null || !string.Equals(password, user.Login, StringComparison.OrdinalIgnoreCase))
-        {
             throw ApiException.Unauthorized("Неверный логин или пароль");
-        }
 
         return new LoginResponse(_tokens.CreateToken(user), DtoMapper.ToDto(user));
     }

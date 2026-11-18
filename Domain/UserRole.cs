@@ -17,21 +17,21 @@ public static class UserRoles
     public const string Admin = "admin";
 
     /// <summary>Код роли для ответа API.</summary>
-    public static string ToCode(UserRole role) => role switch
+    public static string ToCode(UserRole role)
     {
-        UserRole.Student => Student,
-        UserRole.Admin => Admin,
-        _ => throw new ArgumentOutOfRangeException(nameof(role), role, "Неизвестная роль")
-    };
+        return role switch
+        {
+            UserRole.Student => Student,
+            UserRole.Admin => Admin,
+            _ => throw new ArgumentOutOfRangeException(nameof(role), role, "Неизвестная роль")
+        };
+    }
 
     /// <summary>Разбор кода роли без учёта регистра.</summary>
     public static bool TryParse(string? code, out UserRole role)
     {
         role = default;
-        if (string.IsNullOrWhiteSpace(code))
-        {
-            return false;
-        }
+        if (string.IsNullOrWhiteSpace(code)) return false;
 
         switch (code.Trim().ToLowerInvariant())
         {

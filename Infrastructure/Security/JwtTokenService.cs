@@ -10,8 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 namespace CampusFlow.Infrastructure.Security;
 
 /// <summary>
-/// Выпуск и проверка JWT на базе <see cref="JsonWebTokenHandler"/> (пакет Microsoft.IdentityModel.JsonWebTokens).
-/// Подпись — HMAC-SHA256; проверяются алгоритм, подпись, срок действия, издатель и получатель.
+///     Выпуск и проверка JWT на базе <see cref="JsonWebTokenHandler" /> (пакет Microsoft.IdentityModel.JsonWebTokens).
+///     Подпись — HMAC-SHA256; проверяются алгоритм, подпись, срок действия, издатель и получатель.
 /// </summary>
 public sealed class JwtTokenService : ITokenService
 {
@@ -19,10 +19,10 @@ public sealed class JwtTokenService : ITokenService
     private const string LoginClaim = "login";
     private const string DisplayNameClaim = "displayName";
     private const string RoleClaim = "role";
+    private readonly IClock _clock;
 
     private readonly JsonWebTokenHandler _handler = new();
     private readonly JwtOptions _options;
-    private readonly IClock _clock;
     private readonly SigningCredentials _signingCredentials;
     private readonly TokenValidationParameters _validationParameters;
 
@@ -35,10 +35,8 @@ public sealed class JwtTokenService : ITokenService
         _clock = clock;
 
         if (string.IsNullOrWhiteSpace(_options.Key) || _options.Key.Length < JwtOptions.MinimumKeyLength)
-        {
             throw new InvalidOperationException(
                 $"Jwt:Key должен содержать минимум {JwtOptions.MinimumKeyLength} символов.");
-        }
 
         var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
 
@@ -96,10 +94,7 @@ public sealed class JwtTokenService : ITokenService
         string? token,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(token))
-        {
-            return TokenValidationOutcome.Failure("Токен отсутствует");
-        }
+        if (string.IsNullOrWhiteSpace(token)) return TokenValidationOutcome.Failure("Токен отсутствует");
 
         try
         {
@@ -108,24 +103,18 @@ public sealed class JwtTokenService : ITokenService
                 .WaitAsync(cancellationToken);
 
             if (!result.IsValid || result.ClaimsIdentity is null)
-            {
                 return TokenValidationOutcome.Failure(Describe(result.Exception));
-            }
 
             var identity = result.ClaimsIdentity;
 
             var subject = FindClaim(identity, SubjectClaim) ?? FindClaim(identity, ClaimTypes.NameIdentifier);
             if (!int.TryParse(subject, NumberStyles.Integer, CultureInfo.InvariantCulture, out var userId))
-            {
                 return TokenValidationOutcome.Failure("В токене нет идентификатора пользователя");
-            }
 
             var login = FindClaim(identity, LoginClaim) ?? FindClaim(identity, ClaimTypes.Name);
             var roleCode = FindClaim(identity, RoleClaim);
             if (string.IsNullOrEmpty(login) || !UserRoles.TryParse(roleCode, out var role))
-            {
                 return TokenValidationOutcome.Failure("В токене нет роли пользователя");
-            }
 
             var displayName = FindClaim(identity, DisplayNameClaim) ?? login;
             var expiresAt = result.SecurityToken is JsonWebToken jsonWebToken
@@ -149,8 +138,10 @@ public sealed class JwtTokenService : ITokenService
         }
     }
 
-    private static string? FindClaim(ClaimsIdentity identity, string claimType) =>
-        identity.FindFirst(claimType)?.Value;
+    private static string? FindClaim(ClaimsIdentity identity, string claimType)
+    {
+        return identity.FindFirst(claimType)?.Value;
+    }
 
     private bool ValidateLifetime(
         DateTime? notBefore,
@@ -160,24 +151,24 @@ public sealed class JwtTokenService : ITokenService
     {
         var now = DateTime.SpecifyKind(_clock.UtcNow, DateTimeKind.Utc);
 
-        if (expires is null || expires.Value <= now)
-        {
-            return false;
-        }
+        if (expires is null || expires.Value <= now) return false;
 
         return notBefore is null || notBefore.Value <= now;
     }
 
-    private static string Describe(Exception? exception) => exception switch
+    private static string Describe(Exception? exception)
     {
-        SecurityTokenExpiredException => "Срок действия токена истёк",
-        SecurityTokenInvalidLifetimeException => "Срок действия токена истёк",
-        SecurityTokenNoExpirationException => "В токене нет срока действия",
-        SecurityTokenInvalidSignatureException => "Подпись токена недействительна",
-        SecurityTokenInvalidIssuerException => "Неверный издатель токена",
-        SecurityTokenInvalidAudienceException => "Неверный получатель токена",
-        SecurityTokenInvalidAlgorithmException => "Неподдерживаемый алгоритм подписи",
-        SecurityTokenMalformedException => "Неверный формат токена",
-        _ => "Токен недействителен"
-    };
+        return exception switch
+        {
+            SecurityTokenExpiredException => "Срок действия токена истёк",
+            SecurityTokenInvalidLifetimeException => "Срок действия токена истёк",
+            SecurityTokenNoExpirationException => "В токене нет срока действия",
+            SecurityTokenInvalidSignatureException => "Подпись токена недействительна",
+            SecurityTokenInvalidIssuerException => "Неверный издатель токена",
+            SecurityTokenInvalidAudienceException => "Неверный получатель токена",
+            SecurityTokenInvalidAlgorithmException => "Неподдерживаемый алгоритм подписи",
+            SecurityTokenMalformedException => "Неверный формат токена",
+            _ => "Токен недействителен"
+        };
+    }
 }

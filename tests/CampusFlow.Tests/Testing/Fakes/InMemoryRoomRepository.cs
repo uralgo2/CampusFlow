@@ -8,26 +8,20 @@ public sealed class InMemoryRoomRepository : IRoomRepository
 {
     private readonly FakeDatabase _db;
 
-    public InMemoryRoomRepository(FakeDatabase db) => _db = db;
+    public InMemoryRoomRepository(FakeDatabase db)
+    {
+        _db = db;
+    }
 
     public Task<IReadOnlyList<Room>> ListAsync(RoomQuery query, CancellationToken cancellationToken)
     {
         IEnumerable<Room> rooms = _db.Rooms;
 
-        if (query.Building is not null)
-        {
-            rooms = rooms.Where(room => room.Building == query.Building);
-        }
+        if (query.Building is not null) rooms = rooms.Where(room => room.Building == query.Building);
 
-        if (query.MinCapacity is not null)
-        {
-            rooms = rooms.Where(room => room.Capacity >= query.MinCapacity.Value);
-        }
+        if (query.MinCapacity is not null) rooms = rooms.Where(room => room.Capacity >= query.MinCapacity.Value);
 
-        if (query.Equipment.Count > 0)
-        {
-            rooms = rooms.Where(room => query.Equipment.All(room.Equipment.Contains));
-        }
+        if (query.Equipment.Count > 0) rooms = rooms.Where(room => query.Equipment.All(room.Equipment.Contains));
 
         IReadOnlyList<Room> result = rooms
             .OrderBy(room => room.Building)
@@ -38,8 +32,10 @@ public sealed class InMemoryRoomRepository : IRoomRepository
         return Task.FromResult(result);
     }
 
-    public Task<Room?> GetAsync(int id, CancellationToken cancellationToken) =>
-        Task.FromResult(_db.Rooms.FirstOrDefault(room => room.Id == id));
+    public Task<Room?> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(_db.Rooms.FirstOrDefault(room => room.Id == id));
+    }
 
     public Task<bool> NameExistsAsync(string name, int? excludeRoomId, CancellationToken cancellationToken)
     {
@@ -65,5 +61,8 @@ public sealed class InMemoryRoomRepository : IRoomRepository
         return Task.CompletedTask;
     }
 
-    public Task SaveAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task SaveAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
 }

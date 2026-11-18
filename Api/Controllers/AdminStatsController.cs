@@ -16,7 +16,10 @@ public sealed class AdminStatsController : ControllerBase
 {
     private readonly IStatsService _stats;
 
-    public AdminStatsController(IStatsService stats) => _stats = stats;
+    public AdminStatsController(IStatsService stats)
+    {
+        _stats = stats;
+    }
 
     /// <summary>Загрузка по дням, корпусам и аудиториям. По умолчанию — 7 дней, начиная с сегодня.</summary>
     /// <param name="from">Начало периода, YYYY-MM-DD.</param>
@@ -34,6 +37,8 @@ public sealed class AdminStatsController : ControllerBase
         [FromQuery] string? from,
         [FromQuery] string? to,
         [FromQuery] string? building,
-        CancellationToken cancellationToken) =>
-        Ok(await _stats.GetStatsAsync(from, to, building, cancellationToken));
+        CancellationToken cancellationToken)
+    {
+        return Ok(await _stats.GetStatsAsync(from, to, building, cancellationToken));
+    }
 }

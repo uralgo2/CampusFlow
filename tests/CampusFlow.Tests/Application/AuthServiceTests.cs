@@ -18,7 +18,8 @@ public sealed class AuthServiceTests
     {
         var fixture = CreateFixture();
 
-        var response = await fixture.Service.LoginAsync(new LoginRequest("student1", "student1"), CancellationToken.None);
+        var response =
+            await fixture.Service.LoginAsync(new LoginRequest("student1", "student1"), CancellationToken.None);
 
         Equal(3, response.Token.Split('.').Length, "должен вернуться JWT из трёх частей");
         Equal("student1", response.User.Login);
@@ -36,7 +37,8 @@ public sealed class AuthServiceTests
     {
         var fixture = CreateFixture();
 
-        var response = await fixture.Service.LoginAsync(new LoginRequest("Student1", "STUDENT1"), CancellationToken.None);
+        var response =
+            await fixture.Service.LoginAsync(new LoginRequest("Student1", "STUDENT1"), CancellationToken.None);
 
         Equal(1, response.User.Id);
     }

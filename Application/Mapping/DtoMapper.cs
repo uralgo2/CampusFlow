@@ -10,22 +10,27 @@ namespace CampusFlow.Application.Mapping;
 public static class DtoMapper
 {
     /// <summary>Пользователь.</summary>
-    public static UserDto ToDto(User user) =>
-        new(user.Id, user.Login, user.DisplayName, UserRoles.ToCode(user.Role));
+    public static UserDto ToDto(User user)
+    {
+        return new UserDto(user.Id, user.Login, user.DisplayName, UserRoles.ToCode(user.Role));
+    }
 
     /// <summary>Аудитория.</summary>
-    public static RoomDto ToDto(Room room) =>
-        new(
+    public static RoomDto ToDto(Room room)
+    {
+        return new RoomDto(
             room.Id,
             room.Name,
             room.Building,
             room.Floor,
             room.Capacity,
             room.Equipment.Select(EquipmentCatalog.ToCode).ToList());
+    }
 
     /// <summary>Бронь. Требует заполненных навигационных свойств <c>Room</c>.</summary>
-    public static BookingDto ToDto(Booking booking) =>
-        new(
+    public static BookingDto ToDto(Booking booking)
+    {
+        return new BookingDto(
             booking.Id,
             booking.RoomId,
             booking.Room?.Name ?? string.Empty,
@@ -36,8 +41,11 @@ public static class DtoMapper
             ApiParsing.FormatTime(booking.EndTime),
             BookingStatuses.ToCode(booking.Status),
             booking.Comment);
+    }
 
     /// <summary>Свободный интервал.</summary>
-    public static FreeSlotDto ToDto((TimeOnly Start, TimeOnly End) slot) =>
-        new(ApiParsing.FormatTime(slot.Start), ApiParsing.FormatTime(slot.End));
+    public static FreeSlotDto ToDto((TimeOnly Start, TimeOnly End) slot)
+    {
+        return new FreeSlotDto(ApiParsing.FormatTime(slot.Start), ApiParsing.FormatTime(slot.End));
+    }
 }

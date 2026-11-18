@@ -13,9 +13,9 @@ using Microsoft.Net.Http.Headers;
 namespace CampusFlow.Api.Authentication;
 
 /// <summary>
-/// Аутентификация по JWT в заголовке <c>Authorization: Bearer &lt;token&gt;</c>.
-/// Токен проверяется по подписи и сроку действия, после чего пользователь перечитывается из базы:
-/// роль всегда актуальная, а удалённый пользователь не может пользоваться старым токеном.
+///     Аутентификация по JWT в заголовке <c>Authorization: Bearer &lt;token&gt;</c>.
+///     Токен проверяется по подписи и сроку действия, после чего пользователь перечитывается из базы:
+///     роль всегда актуальная, а удалённый пользователь не может пользоваться старым токеном.
 /// </summary>
 public sealed class JwtAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
@@ -42,32 +42,20 @@ public sealed class JwtAuthenticationHandler : AuthenticationHandler<Authenticat
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         if (!Request.Headers.TryGetValue(HeaderNames.Authorization, out var headerValues))
-        {
             return AuthenticateResult.NoResult();
-        }
 
         var header = headerValues.FirstOrDefault();
-        if (string.IsNullOrWhiteSpace(header))
-        {
-            return AuthenticateResult.NoResult();
-        }
+        if (string.IsNullOrWhiteSpace(header)) return AuthenticateResult.NoResult();
 
         if (!header.StartsWith(BearerPrefix, StringComparison.OrdinalIgnoreCase))
-        {
             return AuthenticateResult.Fail("Ожидается заголовок Authorization: Bearer <JWT>");
-        }
 
         var outcome = await _tokens.ValidateAsync(header[BearerPrefix.Length..].Trim(), Context.RequestAborted);
         if (!outcome.IsValid || outcome.Identity is null)
-        {
             return AuthenticateResult.Fail(outcome.Error ?? "Токен недействителен");
-        }
 
         var user = await _users.GetByIdAsync(outcome.Identity.UserId, Context.RequestAborted);
-        if (user is null)
-        {
-            return AuthenticateResult.Fail("Пользователь из токена не найден");
-        }
+        if (user is null) return AuthenticateResult.Fail("Пользователь из токена не найден");
 
         var claims = new[]
         {

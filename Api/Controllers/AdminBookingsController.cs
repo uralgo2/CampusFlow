@@ -17,7 +17,10 @@ public sealed class AdminBookingsController : ControllerBase
 {
     private readonly IBookingService _bookings;
 
-    public AdminBookingsController(IBookingService bookings) => _bookings = bookings;
+    public AdminBookingsController(IBookingService bookings)
+    {
+        _bookings = bookings;
+    }
 
     /// <summary>Все брони с необязательными фильтрами по дате, аудитории, автору и статусу.</summary>
     /// <response code="200">Список броней.</response>
@@ -30,8 +33,10 @@ public sealed class AdminBookingsController : ControllerBase
         [FromQuery] int? roomId,
         [FromQuery] int? userId,
         [FromQuery] string? status,
-        CancellationToken cancellationToken) =>
-        Ok(await _bookings.GetForAdminAsync(date, roomId, userId, status, cancellationToken));
+        CancellationToken cancellationToken)
+    {
+        return Ok(await _bookings.GetForAdminAsync(date, roomId, userId, status, cancellationToken));
+    }
 
     /// <summary>Экспорт броней в CSV с теми же фильтрами.</summary>
     /// <response code="200">CSV-файл.</response>
@@ -62,6 +67,8 @@ public sealed class AdminBookingsController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
-    public async Task<ActionResult<CancelBookingResponse>> Cancel(int id, CancellationToken cancellationToken) =>
-        Ok(await _bookings.CancelByAdminAsync(id, cancellationToken));
+    public async Task<ActionResult<CancelBookingResponse>> Cancel(int id, CancellationToken cancellationToken)
+    {
+        return Ok(await _bookings.CancelByAdminAsync(id, cancellationToken));
+    }
 }

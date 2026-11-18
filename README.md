@@ -5,14 +5,14 @@ REST API и веб-интерфейс для бронирования аудит
 
 ## Стек
 
-| Слой | Технологии |
-| --- | --- |
-| Backend | .NET 9, ASP.NET Core Web API |
-| Данные | EF Core 9, SQLite |
+| Слой           | Технологии                                         |
+|----------------|----------------------------------------------------|
+| Backend        | .NET 9, ASP.NET Core Web API                       |
+| Данные         | EF Core 9, SQLite                                  |
 | Аутентификация | JWT (HS256), Microsoft.IdentityModel.JsonWebTokens |
-| Документация | OpenAPI + Swagger UI (Swashbuckle) |
-| Frontend | HTML, CSS, JavaScript |
-| Тесты | 108 юнит-тестов на встроенном раннере |
+| Документация   | OpenAPI + Swagger UI (Swashbuckle)                 |
+| Frontend       | HTML, CSS, JavaScript                              |
+| Тесты          | 108 юнит-тестов на встроенном раннере              |
 
 ## Требования
 
@@ -26,11 +26,11 @@ dotnet run
 
 Приложение поднимается на `http://localhost:5242`:
 
-| Ресурс | Адрес |
-| --- | --- |
-| Веб-интерфейс | `http://localhost:5242/` |
-| Swagger UI | `http://localhost:5242/swagger` |
-| OpenAPI JSON | `http://localhost:5242/swagger/v1/swagger.json` |
+| Ресурс        | Адрес                                           |
+|---------------|-------------------------------------------------|
+| Веб-интерфейс | `http://localhost:5242/`                        |
+| Swagger UI    | `http://localhost:5242/swagger`                 |
+| OpenAPI JSON  | `http://localhost:5242/swagger/v1/swagger.json` |
 
 При первом запуске создаётся файл `campusflow.db` и загружаются seed-данные.
 
@@ -58,14 +58,14 @@ dotnet run --project tests/CampusFlow.Tests -- --filter BookingService
 
 `appsettings.json`:
 
-| Ключ | Значение по умолчанию | Назначение |
-| --- | --- | --- |
-| `ConnectionStrings:CampusFlow` | `Data Source=campusflow.db` | файл базы SQLite |
-| `Jwt:Issuer` | `CampusFlow` | издатель токена |
-| `Jwt:Audience` | `CampusFlow` | получатель токена |
-| `Jwt:Key` | секрет из `appsettings.json` | ключ HMAC-SHA256, не короче 32 символов |
-| `Jwt:LifetimeMinutes` | `480` | срок действия токена |
-| `Seed:RecreateOnStartup` | `false` (в Development — `true`) | пересоздание базы при старте |
+| Ключ                           | Значение по умолчанию            | Назначение                              |
+|--------------------------------|----------------------------------|-----------------------------------------|
+| `ConnectionStrings:CampusFlow` | `Data Source=campusflow.db`      | файл базы SQLite                        |
+| `Jwt:Issuer`                   | `CampusFlow`                     | издатель токена                         |
+| `Jwt:Audience`                 | `CampusFlow`                     | получатель токена                       |
+| `Jwt:Key`                      | секрет из `appsettings.json`     | ключ HMAC-SHA256, не короче 32 символов |
+| `Jwt:LifetimeMinutes`          | `480`                            | срок действия токена                    |
+| `Seed:RecreateOnStartup`       | `false` (в Development — `true`) | пересоздание базы при старте            |
 
 Любой параметр переопределяется переменной окружения:
 
@@ -104,15 +104,15 @@ Authorization: Bearer <token>
 
 Состав токена:
 
-| Claim | Содержимое |
-| --- | --- |
-| `sub` | идентификатор пользователя |
-| `login` | логин |
-| `displayName` | отображаемое имя |
-| `role` | `student` или `admin` |
-| `jti` | уникальный идентификатор токена |
+| Claim               | Содержимое                             |
+|---------------------|----------------------------------------|
+| `sub`               | идентификатор пользователя             |
+| `login`             | логин                                  |
+| `displayName`       | отображаемое имя                       |
+| `role`              | `student` или `admin`                  |
+| `jti`               | уникальный идентификатор токена        |
 | `iat`, `nbf`, `exp` | время выпуска, начало и конец действия |
-| `iss`, `aud` | издатель и получатель |
+| `iss`, `aud`        | издатель и получатель                  |
 
 При проверке контролируются подпись, алгоритм (`HS256`), срок действия, издатель и получатель;
 `ClockSkew` равен нулю. После проверки токена пользователь загружается из базы, поэтому роль и
@@ -120,37 +120,37 @@ Authorization: Bearer <token>
 
 Роли:
 
-| Действие | student | admin |
-| --- | --- | --- |
-| Аудитории, свободные слоты | да | да |
-| Создание брони | да | да |
-| Свои брони, отмена своей брони | да | да |
-| Все брони, отмена любой брони | нет | да |
-| Управление аудиториями | нет | да |
-| Статистика загрузки | нет | да |
+| Действие                       | student | admin |
+|--------------------------------|---------|-------|
+| Аудитории, свободные слоты     | да      | да    |
+| Создание брони                 | да      | да    |
+| Свои брони, отмена своей брони | да      | да    |
+| Все брони, отмена любой брони  | нет     | да    |
+| Управление аудиториями         | нет     | да    |
+| Статистика загрузки            | нет     | да    |
 
 ## API
 
 Базовый путь — `/api`. Формат обмена — JSON, UTF-8. Даты `YYYY-MM-DD`, время `HH:MM`.
 
-| Метод | Путь | Доступ | Успех | Ошибки |
-| --- | --- | --- | --- | --- |
-| POST | `/api/auth/login` | все | 200 | 400, 401 |
-| GET | `/api/auth/me` | токен | 200 | 401 |
-| GET | `/api/rooms` | все | 200 | 400 |
-| GET | `/api/rooms/{id}` | все | 200 | 404 |
-| GET | `/api/rooms/{id}/free-slots?date=` | все | 200 | 400, 404 |
-| GET | `/api/rooms/free?date=&startTime=&endTime=` | все | 200 | 400 |
-| POST | `/api/bookings` | токен | 201 | 400, 401, 404, 409 |
-| GET | `/api/bookings/my?status=` | токен | 200 | 400, 401 |
-| DELETE | `/api/bookings/{id}` | токен | 200 | 401, 403, 404, 409 |
-| GET | `/api/admin/bookings?date=&roomId=&userId=&status=` | admin | 200 | 400, 403 |
-| GET | `/api/admin/bookings/export` | admin | 200 (CSV) | 400, 403 |
-| DELETE | `/api/admin/bookings/{id}` | admin | 200 | 403, 404, 409 |
-| POST | `/api/admin/rooms` | admin | 201 | 400, 403 |
-| PUT | `/api/admin/rooms/{id}` | admin | 200 | 400, 403, 404 |
-| DELETE | `/api/admin/rooms/{id}` | admin | 204 | 403, 404, 409 |
-| GET | `/api/admin/stats?from=&to=&building=` | admin | 200 | 400, 403 |
+| Метод  | Путь                                                | Доступ | Успех     | Ошибки             |
+|--------|-----------------------------------------------------|--------|-----------|--------------------|
+| POST   | `/api/auth/login`                                   | все    | 200       | 400, 401           |
+| GET    | `/api/auth/me`                                      | токен  | 200       | 401                |
+| GET    | `/api/rooms`                                        | все    | 200       | 400                |
+| GET    | `/api/rooms/{id}`                                   | все    | 200       | 404                |
+| GET    | `/api/rooms/{id}/free-slots?date=`                  | все    | 200       | 400, 404           |
+| GET    | `/api/rooms/free?date=&startTime=&endTime=`         | все    | 200       | 400                |
+| POST   | `/api/bookings`                                     | токен  | 201       | 400, 401, 404, 409 |
+| GET    | `/api/bookings/my?status=`                          | токен  | 200       | 400, 401           |
+| DELETE | `/api/bookings/{id}`                                | токен  | 200       | 401, 403, 404, 409 |
+| GET    | `/api/admin/bookings?date=&roomId=&userId=&status=` | admin  | 200       | 400, 403           |
+| GET    | `/api/admin/bookings/export`                        | admin  | 200 (CSV) | 400, 403           |
+| DELETE | `/api/admin/bookings/{id}`                          | admin  | 200       | 403, 404, 409      |
+| POST   | `/api/admin/rooms`                                  | admin  | 201       | 400, 403           |
+| PUT    | `/api/admin/rooms/{id}`                             | admin  | 200       | 400, 403, 404      |
+| DELETE | `/api/admin/rooms/{id}`                             | admin  | 204       | 403, 404, 409      |
+| GET    | `/api/admin/stats?from=&to=&building=`              | admin  | 200       | 400, 403           |
 
 ### Ошибки
 
@@ -162,19 +162,19 @@ Authorization: Bearer <token>
 }
 ```
 
-| Код | HTTP |
-| --- | --- |
-| `VALIDATION_ERROR` | 400 |
-| `UNAUTHORIZED` | 401 |
-| `FORBIDDEN` | 403 |
-| `ROOM_NOT_FOUND` | 404 |
-| `BOOKING_NOT_FOUND` | 404 |
-| `NOT_FOUND` | 404 |
-| `METHOD_NOT_ALLOWED` | 405 |
-| `BOOKING_CONFLICT` | 409 |
-| `ALREADY_CANCELLED` | 409 |
-| `ROOM_IN_USE` | 409 |
-| `INTERNAL_ERROR` | 500 |
+| Код                  | HTTP |
+|----------------------|------|
+| `VALIDATION_ERROR`   | 400  |
+| `UNAUTHORIZED`       | 401  |
+| `FORBIDDEN`          | 403  |
+| `ROOM_NOT_FOUND`     | 404  |
+| `BOOKING_NOT_FOUND`  | 404  |
+| `NOT_FOUND`          | 404  |
+| `METHOD_NOT_ALLOWED` | 405  |
+| `BOOKING_CONFLICT`   | 409  |
+| `ALREADY_CANCELLED`  | 409  |
+| `ROOM_IN_USE`        | 409  |
+| `INTERNAL_ERROR`     | 500  |
 
 ### Правила бронирования
 
@@ -233,10 +233,10 @@ Content-Type: application/json
 
 ## Модель данных
 
-| Сущность | Поля |
-| --- | --- |
-| `User` | `id`, `login`, `displayName`, `role` |
-| `Room` | `id`, `name`, `building`, `floor`, `capacity`, `equipment` |
+| Сущность  | Поля                                                                          |
+|-----------|-------------------------------------------------------------------------------|
+| `User`    | `id`, `login`, `displayName`, `role`                                          |
+| `Room`    | `id`, `name`, `building`, `floor`, `capacity`, `equipment`                    |
 | `Booking` | `id`, `roomId`, `userId`, `date`, `startTime`, `endTime`, `status`, `comment` |
 
 Оборудование: `projector`, `whiteboard`, `computers`, `audio`, `video`. Корпус: `A`, `B`, `C`, `D`.
@@ -246,11 +246,11 @@ Content-Type: application/json
 
 Пароль пользователей равен логину.
 
-| Логин | Имя | Роль |
-| --- | --- | --- |
-| `student1` | Иван Студентов | student |
-| `student2` | Мария Студентова | student |
-| `admin` | Администратор Пупкин | admin |
+| Логин      | Имя                  | Роль    |
+|------------|----------------------|---------|
+| `student1` | Иван Студентов       | student |
+| `student2` | Мария Студентова     | student |
+| `admin`    | Администратор Пупкин | admin   |
 
 Аудитории и брони:
 

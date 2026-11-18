@@ -38,12 +38,8 @@ public static class EquipmentCatalog
     public static string ToCode(Equipment equipment)
     {
         foreach (var pair in ByCode)
-        {
             if (pair.Value == equipment)
-            {
                 return pair.Key;
-            }
-        }
 
         throw new ArgumentOutOfRangeException(nameof(equipment), equipment, "Неизвестный тип оборудования");
     }
@@ -52,17 +48,16 @@ public static class EquipmentCatalog
     public static bool TryParse(string? code, out Equipment equipment)
     {
         equipment = default;
-        if (string.IsNullOrWhiteSpace(code))
-        {
-            return false;
-        }
+        if (string.IsNullOrWhiteSpace(code)) return false;
 
         return ByCode.TryGetValue(code.Trim(), out equipment);
     }
 
     /// <summary>Разобрать код оборудования, бросив исключение при ошибке.</summary>
-    public static Equipment Parse(string code) =>
-        TryParse(code, out var equipment)
+    public static Equipment Parse(string code)
+    {
+        return TryParse(code, out var equipment)
             ? equipment
             : throw new FormatException($"Неизвестное оборудование: {code}");
+    }
 }

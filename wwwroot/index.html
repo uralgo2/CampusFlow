@@ -1,41 +1,70 @@
 <!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta charset="UTF-8">
+    <meta content="width=device-width,initial-scale=1" name="viewport">
     <title>CampusFlow — УУНиТ</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css2?family=Golos:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css"></head>
+    <link href="style.css" rel="stylesheet">
+</head>
 <body>
 
-<div class="auth-screen hidden" id="authScreen" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+<div aria-labelledby="authTitle" aria-modal="true" class="auth-screen hidden" id="authScreen" role="dialog">
     <div class="auth-card auth-modal-card">
-        <button class="auth-close" type="button" onclick="closeLogin()" aria-label="Закрыть">×</button>
-        <div class="auth-brand"><div class="auth-mark">УУ</div><div><div class="auth-brand-name">CampusFlow</div><div class="auth-brand-sub">УФИМСКИЙ УНИВЕРСИТЕТ · УУНиТ</div></div></div>
-        <div class="auth-intro"><div class="kicker">ЛИЧНЫЙ КАБИНЕТ</div><h1 id="authTitle">Войти в CampusFlow</h1><p id="authSubtitle">Войдите, чтобы бронировать аудитории и управлять своими заявками.</p></div>
-        <form id="loginForm" class="auth-form">
-            <label>ЛОГИН ИЛИ ЭЛЕКТРОННАЯ ПОЧТА<input id="loginIdentity" autocomplete="username" placeholder="Например, student1" required></label>
-            <label>ПАРОЛЬ<input id="loginPassword" type="password" autocomplete="current-password" placeholder="Введите пароль" required></label>
+        <button aria-label="Закрыть" class="auth-close" onclick="closeLogin()" type="button">×</button>
+        <div class="auth-brand">
+            <div class="auth-mark">УУ</div>
+            <div>
+                <div class="auth-brand-name">CampusFlow</div>
+                <div class="auth-brand-sub">УФИМСКИЙ УНИВЕРСИТЕТ · УУНиТ</div>
+            </div>
+        </div>
+        <div class="auth-intro">
+            <div class="kicker">ЛИЧНЫЙ КАБИНЕТ</div>
+            <h1 id="authTitle">Войти в CampusFlow</h1>
+            <p id="authSubtitle">Войдите, чтобы бронировать аудитории и управлять своими заявками.</p></div>
+        <form class="auth-form" id="loginForm">
+            <label>ЛОГИН ИЛИ ЭЛЕКТРОННАЯ ПОЧТА<input autocomplete="username" id="loginIdentity"
+                                                     placeholder="Например, student1" required></label>
+            <label>ПАРОЛЬ<input autocomplete="current-password" id="loginPassword" placeholder="Введите пароль"
+                                required type="password"></label>
             <button class="btn auth-submit" type="submit">Войти <span>→</span></button>
             <div class="auth-error" id="loginError" role="alert"></div>
-            <div class="auth-switch">Нет аккаунта? <button type="button" id="showRegisterBtn">Зарегистрироваться</button></div>
+            <div class="auth-switch">Нет аккаунта?
+                <button id="showRegisterBtn" type="button">Зарегистрироваться</button>
+            </div>
         </form>
-        <form id="registerForm" class="auth-form hidden">
-            <label>ВАШЕ ИМЯ И ФАМИЛИЯ<input id="registerName" autocomplete="name" placeholder="Например, Анна Смирнова" required minlength="2"></label>
-            <label>ЭЛЕКТРОННАЯ ПОЧТА УУНиТ<input id="registerEmail" type="email" autocomplete="email" placeholder="name@uust.ru" required></label>
-            <label>ЛОГИН<input id="registerLogin" autocomplete="username" placeholder="Придумайте логин" required minlength="3"></label>
-            <label>ПАРОЛЬ<input id="registerPassword" type="password" autocomplete="new-password" placeholder="Не менее 6 символов" required minlength="6"></label>
-            <label>ПОВТОРИТЕ ПАРОЛЬ<input id="registerPassword2" type="password" autocomplete="new-password" placeholder="Введите пароль ещё раз" required minlength="6"></label>
+        <form class="auth-form hidden" id="registerForm">
+            <label>ВАШЕ ИМЯ И ФАМИЛИЯ<input autocomplete="name" id="registerName" minlength="2"
+                                            placeholder="Например, Анна Смирнова" required></label>
+            <label>ЭЛЕКТРОННАЯ ПОЧТА УУНиТ<input autocomplete="email" id="registerEmail" placeholder="name@uust.ru"
+                                                 required type="email"></label>
+            <label>ЛОГИН<input autocomplete="username" id="registerLogin" minlength="3" placeholder="Придумайте логин"
+                               required></label>
+            <label>ПАРОЛЬ<input autocomplete="new-password" id="registerPassword" minlength="6"
+                                placeholder="Не менее 6 символов" required type="password"></label>
+            <label>ПОВТОРИТЕ ПАРОЛЬ<input autocomplete="new-password" id="registerPassword2" minlength="6"
+                                          placeholder="Введите пароль ещё раз" required type="password"></label>
             <button class="btn auth-submit" type="submit">Создать аккаунт <span>→</span></button>
             <div class="auth-error" id="registerError" role="alert"></div>
-            <div class="auth-switch">Уже есть аккаунт? <button type="button" id="showLoginBtn">Войти</button></div>
+            <div class="auth-switch">Уже есть аккаунт?
+                <button id="showLoginBtn" type="button">Войти</button>
+            </div>
         </form>
     </div>
 </div>
 
 <div class="app" id="appShell">
     <aside class="sidebar">
-        <div class="brand"><div class="brand-icon">УУ</div><div class="brand-copy"><div class="brand-name">CampusFlow</div><div class="brand-sub">УФИМСКИЙ УНИВЕРСИТЕТ</div></div></div>
+        <div class="brand">
+            <div class="brand-icon">УУ</div>
+            <div class="brand-copy">
+                <div class="brand-name">CampusFlow</div>
+                <div class="brand-sub">УФИМСКИЙ УНИВЕРСИТЕТ</div>
+            </div>
+        </div>
         <div class="nav-caption">РАБОЧЕЕ ПРОСТРАНСТВО</div>
         <nav class="nav">
             <button class="active" data-page="overview"><span class="nav-icon">⌂</span><span>Обзор</span></button>
@@ -44,122 +73,358 @@
             <div class="nav-caption" style="padding-top:20px">УПРАВЛЕНИЕ</div>
             <button data-page="admin"><span class="nav-icon">⚙</span><span>Администратор</span></button>
         </nav>
-        <div class="sidebar-foot"><strong>CampusFlow · УУНиТ</strong>Единое пространство для поиска и бронирования университетских аудиторий.</div>
+        <div class="sidebar-foot"><strong>CampusFlow · УУНиТ</strong>Единое пространство для поиска и бронирования
+            университетских аудиторий.
+        </div>
     </aside>
     <main class="main">
-        <header class="topbar"><div class="breadcrumb">УУНиТ <span class="muted">/</span> <b id="crumb">Обзор</b></div><div class="top-actions"><span class="campus-label">УФИМСКИЙ УНИВЕРСИТЕТ · ЦИФРОВОЙ КАМПУС</span><div class="user" id="userArea"><button class="btn btn-primary" id="loginOpenBtn" type="button" onclick="openLogin()">Войти</button><div class="avatar hidden" id="avatar">Г</div><div class="user-meta hidden" id="userMeta"><div class="user-name" id="userName"></div><div class="user-role" id="userRole"></div></div><button class="btn btn-soft logout-btn hidden" id="logoutBtn" type="button">Выйти</button></div></div></header>
+        <header class="topbar">
+            <div class="breadcrumb">УУНиТ <span class="muted">/</span> <b id="crumb">Обзор</b></div>
+            <div class="top-actions"><span class="campus-label">УФИМСКИЙ УНИВЕРСИТЕТ · ЦИФРОВОЙ КАМПУС</span>
+                <div class="user" id="userArea">
+                    <button class="btn btn-primary" id="loginOpenBtn" onclick="openLogin()" type="button">Войти</button>
+                    <div class="avatar hidden" id="avatar">Г</div>
+                    <div class="user-meta hidden" id="userMeta">
+                        <div class="user-name" id="userName"></div>
+                        <div class="user-role" id="userRole"></div>
+                    </div>
+                    <button class="btn btn-soft logout-btn hidden" id="logoutBtn" type="button">Выйти</button>
+                </div>
+            </div>
+        </header>
         <div class="wrap">
 
             <section class="page active" id="overview">
-                <div class="hero-banner"><div class="hero-copy"><div class="kicker">✦ Цифровой кампус · УУНиТ</div><h1>Пространство для<br>больших идей</h1><p>Находите аудитории, собирайте команду и бронируйте удобное время — всё в одном месте.</p><div class="hero-actions"><button class="btn hero-cta" onclick="go('rooms')">Найти аудиторию <span>→</span></button><span class="hero-note">12 пространств · 4 корпуса</span></div></div><div class="hero-photo"><div class="hero-photo-chip">✦ CampusFlow</div></div><div class="hero-date" id="todayLabel"></div></div>
-                <div class="stats">
-                    <div class="stat"><div class="stat-label">Всего аудиторий <span class="stat-icon">▣</span></div><div class="stat-value" id="totalRooms">12</div><div class="stat-note">В каталоге</div></div>
-                    <div class="stat"><div class="stat-label">Свободно сегодня <span class="stat-icon">✓</span></div><div class="stat-value" id="freeRooms">12</div><div class="stat-note">По активным бронированиям</div></div>
-                    <div class="stat"><div class="stat-label">Мои активные брони <span class="stat-icon">▤</span></div><div class="stat-value" id="myCount">0</div><div class="stat-note">Текущий пользователь</div></div>
-                    <div class="stat"><div class="stat-label">Корпуса <span class="stat-icon">⌖</span></div><div class="stat-value" id="buildingCount">4</div><div class="stat-note" id="buildingList">A, B, C и D</div></div>
+                <div class="hero-banner">
+                    <div class="hero-copy">
+                        <div class="kicker">✦ Цифровой кампус · УУНиТ</div>
+                        <h1>Пространство для<br>больших идей</h1>
+                        <p>Находите аудитории, собирайте команду и бронируйте удобное время — всё в одном месте.</p>
+                        <div class="hero-actions">
+                            <button class="btn hero-cta" onclick="go('rooms')">Найти аудиторию <span>→</span></button>
+                            <span class="hero-note">12 пространств · 4 корпуса</span></div>
+                    </div>
+                    <div class="hero-photo">
+                        <div class="hero-photo-chip">✦ CampusFlow</div>
+                    </div>
+                    <div class="hero-date" id="todayLabel"></div>
                 </div>
-                <div class="panel"><div class="panel-title"><div><h2>Найти свободную аудиторию</h2><p>Фильтры поиска, включая проверку свободных интервалов на дату</p></div><button class="btn btn-soft" onclick="go('rooms')">Открыть каталог →</button></div>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-label">Всего аудиторий <span class="stat-icon">▣</span></div>
+                        <div class="stat-value" id="totalRooms">12</div>
+                        <div class="stat-note">В каталоге</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Свободно сегодня <span class="stat-icon">✓</span></div>
+                        <div class="stat-value" id="freeRooms">12</div>
+                        <div class="stat-note">По активным бронированиям</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Мои активные брони <span class="stat-icon">▤</span></div>
+                        <div class="stat-value" id="myCount">0</div>
+                        <div class="stat-note">Текущий пользователь</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Корпуса <span class="stat-icon">⌖</span></div>
+                        <div class="stat-value" id="buildingCount">4</div>
+                        <div class="stat-note" id="buildingList">A, B, C и D</div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-title">
+                        <div><h2>Найти свободную аудиторию</h2>
+                            <p>Фильтры поиска, включая проверку свободных интервалов на дату</p></div>
+                        <button class="btn btn-soft" onclick="go('rooms')">Открыть каталог →</button>
+                    </div>
                     <div class="filters filters-wide">
                         <div class="field"><label>ДАТА</label><input id="quickDate" type="date"></div>
-                        <div class="field"><label>КОРПУС</label><select id="quickBuilding"><option value="">Все корпуса</option><option>A</option><option>B</option><option>C</option><option>D</option></select></div>
-                        <div class="field"><label>ВМЕСТИМОСТЬ ОТ</label><select id="quickCapacity"><option value="0">Любая</option><option value="15">15 человек</option><option value="25">25 человек</option><option value="40">40 человек</option><option value="60">60 человек</option></select></div>
-                        <div class="field"><label>ОБОРУДОВАНИЕ</label><select id="quickEquipment"><option value="">Любое</option><option>Проектор</option><option>Компьютеры</option><option>Интерактивная доска</option><option>Акустическая система</option><option>Оборудование для видеоконференций</option></select></div>
+                        <div class="field"><label>КОРПУС</label><select id="quickBuilding">
+                            <option value="">Все корпуса</option>
+                            <option>A</option>
+                            <option>B</option>
+                            <option>C</option>
+                            <option>D</option>
+                        </select></div>
+                        <div class="field"><label>ВМЕСТИМОСТЬ ОТ</label><select id="quickCapacity">
+                            <option value="0">Любая</option>
+                            <option value="15">15 человек</option>
+                            <option value="25">25 человек</option>
+                            <option value="40">40 человек</option>
+                            <option value="60">60 человек</option>
+                        </select></div>
+                        <div class="field"><label>ОБОРУДОВАНИЕ</label><select id="quickEquipment">
+                            <option value="">Любое</option>
+                            <option>Проектор</option>
+                            <option>Компьютеры</option>
+                            <option>Интерактивная доска</option>
+                            <option>Акустическая система</option>
+                            <option>Оборудование для видеоконференций</option>
+                        </select></div>
                         <div class="field"><label>НАЧАЛО</label><select id="quickStart">
                             <option value="">Любое</option>
-                            <option>09:00</option><option>09:30</option><option>10:00</option><option>10:30</option>
-                            <option>11:00</option><option>11:30</option><option>12:00</option><option>12:30</option>
-                            <option>13:00</option><option>13:30</option><option>14:00</option><option>14:30</option>
-                            <option>15:00</option><option>15:30</option><option>16:00</option><option>16:30</option>
-                            <option>17:00</option><option>17:30</option>
+                            <option>09:00</option>
+                            <option>09:30</option>
+                            <option>10:00</option>
+                            <option>10:30</option>
+                            <option>11:00</option>
+                            <option>11:30</option>
+                            <option>12:00</option>
+                            <option>12:30</option>
+                            <option>13:00</option>
+                            <option>13:30</option>
+                            <option>14:00</option>
+                            <option>14:30</option>
+                            <option>15:00</option>
+                            <option>15:30</option>
+                            <option>16:00</option>
+                            <option>16:30</option>
+                            <option>17:00</option>
+                            <option>17:30</option>
                         </select></div>
                         <div class="field"><label>ОКОНЧАНИЕ</label><select id="quickEnd">
                             <option value="">Любое</option>
-                            <option>09:30</option><option>10:00</option><option>10:30</option><option>11:00</option>
-                            <option>11:30</option><option>12:00</option><option>12:30</option><option>13:00</option>
-                            <option>13:30</option><option>14:00</option><option>14:30</option><option>15:00</option>
-                            <option>15:30</option><option>16:00</option><option>16:30</option><option>17:00</option>
-                            <option>17:30</option><option>18:00</option>
+                            <option>09:30</option>
+                            <option>10:00</option>
+                            <option>10:30</option>
+                            <option>11:00</option>
+                            <option>11:30</option>
+                            <option>12:00</option>
+                            <option>12:30</option>
+                            <option>13:00</option>
+                            <option>13:30</option>
+                            <option>14:00</option>
+                            <option>14:30</option>
+                            <option>15:00</option>
+                            <option>15:30</option>
+                            <option>16:00</option>
+                            <option>16:30</option>
+                            <option>17:00</option>
+                            <option>17:30</option>
+                            <option>18:00</option>
                         </select></div>
                         <button class="btn" onclick="applyQuick()">Найти</button>
-                    </div></div>
+                    </div>
+                </div>
                 <div class="content-grid">
-                    <div class="panel"><div class="panel-title"><div><h2>Свободные аудитории</h2><p>Быстрый доступ к помещениям кампуса</p></div><button class="btn btn-soft" onclick="go('rooms')">Все аудитории</button></div><div class="rooms-grid" id="featuredRooms"></div></div>
-                    <div class="panel"><div class="panel-title"><div><h2>Мои ближайшие брони</h2><p>Ваши запланированные занятия</p></div></div><div class="quick-list" id="upcoming"></div><div class="tip" style="margin-top:15px"><strong>Как это работает?</strong>Выберите аудиторию, дату и свободный интервал. Система автоматически проверит пересечения бронирований.</div></div>
+                    <div class="panel">
+                        <div class="panel-title">
+                            <div><h2>Свободные аудитории</h2>
+                                <p>Быстрый доступ к помещениям кампуса</p></div>
+                            <button class="btn btn-soft" onclick="go('rooms')">Все аудитории</button>
+                        </div>
+                        <div class="rooms-grid" id="featuredRooms"></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-title">
+                            <div><h2>Мои ближайшие брони</h2>
+                                <p>Ваши запланированные занятия</p></div>
+                        </div>
+                        <div class="quick-list" id="upcoming"></div>
+                        <div class="tip" style="margin-top:15px"><strong>Как это работает?</strong>Выберите аудиторию,
+                            дату и свободный интервал. Система автоматически проверит пересечения бронирований.
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <section class="page" id="rooms">
-                <div class="page-heading"><div><div class="kicker">Каталог кампуса</div><h1>Аудитории</h1><p>Единый список помещений с вместимостью и оборудованием.</p></div><div class="date-pill">12 аудиторий · 4 корпуса</div></div>
-                <div class="panel"><div class="filters">
-                    <div class="field"><label>ПОИСК ПО НОМЕРУ</label><input id="searchRoom" placeholder="Например, B-101"></div>
-                    <div class="field"><label>КОРПУС</label><select id="filterBuilding"><option value="">Все корпуса</option><option>A</option><option>B</option><option>C</option><option>D</option></select></div>
-                    <div class="field"><label>ВМЕСТИМОСТЬ ОТ</label><select id="filterCapacity"><option value="0">Любая</option><option value="15">15 человек</option><option value="25">25 человек</option><option value="40">40 человек</option><option value="60">60 человек</option></select></div>
-                    <div class="field"><label>ОБОРУДОВАНИЕ</label><select id="filterEquipment"><option value="">Любое</option><option>Проектор</option><option>Компьютеры</option><option>Интерактивная доска</option><option>Акустическая система</option><option>Оборудование для видеоконференций</option></select></div>
-                    <button class="btn" onclick="renderRooms()">Применить</button>
-                </div></div><div class="rooms-grid" id="allRooms"></div>
+                <div class="page-heading">
+                    <div>
+                        <div class="kicker">Каталог кампуса</div>
+                        <h1>Аудитории</h1>
+                        <p>Единый список помещений с вместимостью и оборудованием.</p></div>
+                    <div class="date-pill">12 аудиторий · 4 корпуса</div>
+                </div>
+                <div class="panel">
+                    <div class="filters">
+                        <div class="field"><label>ПОИСК ПО НОМЕРУ</label><input id="searchRoom"
+                                                                                placeholder="Например, B-101"></div>
+                        <div class="field"><label>КОРПУС</label><select id="filterBuilding">
+                            <option value="">Все корпуса</option>
+                            <option>A</option>
+                            <option>B</option>
+                            <option>C</option>
+                            <option>D</option>
+                        </select></div>
+                        <div class="field"><label>ВМЕСТИМОСТЬ ОТ</label><select id="filterCapacity">
+                            <option value="0">Любая</option>
+                            <option value="15">15 человек</option>
+                            <option value="25">25 человек</option>
+                            <option value="40">40 человек</option>
+                            <option value="60">60 человек</option>
+                        </select></div>
+                        <div class="field"><label>ОБОРУДОВАНИЕ</label><select id="filterEquipment">
+                            <option value="">Любое</option>
+                            <option>Проектор</option>
+                            <option>Компьютеры</option>
+                            <option>Интерактивная доска</option>
+                            <option>Акустическая система</option>
+                            <option>Оборудование для видеоконференций</option>
+                        </select></div>
+                        <button class="btn" onclick="renderRooms()">Применить</button>
+                    </div>
+                </div>
+                <div class="rooms-grid" id="allRooms"></div>
             </section>
 
             <section class="page" id="bookings">
-                <div class="page-heading"><div><div class="kicker">Личный кабинет</div><h1>Мои бронирования</h1><p>Просматривайте и отменяйте собственные бронирования.</p></div></div>
+                <div class="page-heading">
+                    <div>
+                        <div class="kicker">Личный кабинет</div>
+                        <h1>Мои бронирования</h1>
+                        <p>Просматривайте и отменяйте собственные бронирования.</p></div>
+                </div>
                 <div class="panel">
                     <div class="panel-title">
-                        <div><h2>История бронирований</h2><p>Слоты и статусы ваших заявок</p></div>
-                        <select id="myStatusFilter" class="mini-select">
+                        <div><h2>История бронирований</h2>
+                            <p>Слоты и статусы ваших заявок</p></div>
+                        <select class="mini-select" id="myStatusFilter">
                             <option value="">Все статусы</option>
                             <option value="active">Активные</option>
                             <option value="cancelled">Отменённые</option>
                         </select>
                     </div>
-                    <div class="table-wrap"><table><thead><tr><th>Аудитория</th><th>Дата</th><th>Время</th><th>Комментарий</th><th>Статус</th><th>Действие</th></tr></thead><tbody id="myBookings"></tbody></table></div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Аудитория</th>
+                                <th>Дата</th>
+                                <th>Время</th>
+                                <th>Комментарий</th>
+                                <th>Статус</th>
+                                <th>Действие</th>
+                            </tr>
+                            </thead>
+                            <tbody id="myBookings"></tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
             <section class="page" id="admin">
-                <div class="page-heading"><div><div class="kicker">Управление кампусом</div><h1>Панель администратора</h1><p>Полная картина бронирований и контроль загрузки аудиторий.</p></div></div>
+                <div class="page-heading">
+                    <div>
+                        <div class="kicker">Управление кампусом</div>
+                        <h1>Панель администратора</h1>
+                        <p>Полная картина бронирований и контроль загрузки аудиторий.</p></div>
+                </div>
                 <div class="stats">
-                    <div class="stat"><div class="stat-label">Всего броней <span class="stat-icon">▤</span></div><div class="stat-value" id="adminTotal">0</div><div class="stat-note"></div></div>
-                    <div class="stat"><div class="stat-label">Активные <span class="stat-icon">✓</span></div><div class="stat-value" id="adminActive">0</div><div class="stat-note">Не отменены</div></div>
-                    <div class="stat"><div class="stat-label">Аудиторий <span class="stat-icon">▣</span></div><div class="stat-value" id="adminRoomStat">12</div><div class="stat-note">В справочнике</div></div>
-                    <div class="stat"><div class="stat-label">Корпуса <span class="stat-icon">⌖</span></div><div class="stat-value" id="adminBuildingCount">4</div><div class="stat-note">В системе</div></div>
+                    <div class="stat">
+                        <div class="stat-label">Всего броней <span class="stat-icon">▤</span></div>
+                        <div class="stat-value" id="adminTotal">0</div>
+                        <div class="stat-note"></div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Активные <span class="stat-icon">✓</span></div>
+                        <div class="stat-value" id="adminActive">0</div>
+                        <div class="stat-note">Не отменены</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Аудиторий <span class="stat-icon">▣</span></div>
+                        <div class="stat-value" id="adminRoomStat">12</div>
+                        <div class="stat-note">В справочнике</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Корпуса <span class="stat-icon">⌖</span></div>
+                        <div class="stat-value" id="adminBuildingCount">4</div>
+                        <div class="stat-note">В системе</div>
+                    </div>
                 </div>
 
                 <div class="panel">
-                    <div class="panel-title"><div><h2>Статистика загрузки</h2><p>Агрегированные показатели по аудиториям за период</p></div></div>
+                    <div class="panel-title">
+                        <div><h2>Статистика загрузки</h2>
+                            <p>Агрегированные показатели по аудиториям за период</p></div>
+                    </div>
                     <div class="admin-filters">
-                        <div class="field"><label>С</label><input type="date" id="statsFrom"></div>
-                        <div class="field"><label>ПО</label><input type="date" id="statsTo"></div>
+                        <div class="field"><label>С</label><input id="statsFrom" type="date"></div>
+                        <div class="field"><label>ПО</label><input id="statsTo" type="date"></div>
                         <div class="field"><label>КОРПУС</label>
                             <select id="statsBuilding">
                                 <option value="">Все</option>
-                                <option value="A">A</option><option value="B">B</option>
-                                <option value="C">C</option><option value="D">D</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
                             </select>
                         </div>
-                        <button class="btn" type="button" id="statsLoadBtn">Показать</button>
+                        <button class="btn" id="statsLoadBtn" type="button">Показать</button>
                     </div>
-                    <div id="statsResult" class="stats-result"><div class="empty">Выберите период и нажмите «Показать»</div></div>
+                    <div class="stats-result" id="statsResult">
+                        <div class="empty">Выберите период и нажмите «Показать»</div>
+                    </div>
                 </div>
 
                 <div class="panel">
-                    <div class="panel-title"><div><h2 id="roomFormTitle">Добавить аудиторию</h2><p>Создавайте помещения и редактируйте параметры существующих.</p></div><span class="admin-counter" id="adminRoomCount">12 помещений</span></div>
-                    <form id="roomForm" class="room-admin-form">
-                        <div class="field"><label for="roomName">НОМЕР АУДИТОРИИ</label><input id="roomName" placeholder="Например, A-105" required maxlength="20"></div>
-                        <div class="field"><label for="roomBuilding">КОРПУС</label><select id="roomBuilding" required><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></div>
-                        <div class="field"><label for="roomFloor">ЭТАЖ</label><input id="roomFloor" type="number" min="1" max="20" value="1" required></div>
-                        <div class="field"><label for="roomCapacity">ВМЕСТИМОСТЬ</label><input id="roomCapacity" type="number" min="1" max="1000" placeholder="30" required></div>
-                        <div class="field"><label for="roomDesc">ТИП / ОПИСАНИЕ</label><input id="roomDesc" placeholder="Учебная аудитория" required maxlength="80"></div>
-                        <div class="field"><label for="roomEquipment">ОБОРУДОВАНИЕ</label><input id="roomEquipment" placeholder="Проектор, Интерактивная доска, Компьютеры, Акустическая система, Оборудование для видеоконференций"></div>
-                        <div class="room-admin-actions"><button class="btn" id="saveRoomBtn" type="submit">Добавить аудиторию</button><button class="btn btn-soft hidden" id="cancelRoomEdit" type="button" onclick="resetRoomForm()">Отмена</button></div>
+                    <div class="panel-title">
+                        <div><h2 id="roomFormTitle">Добавить аудиторию</h2>
+                            <p>Создавайте помещения и редактируйте параметры существующих.</p></div>
+                        <span class="admin-counter" id="adminRoomCount">12 помещений</span></div>
+                    <form class="room-admin-form" id="roomForm">
+                        <div class="field"><label for="roomName">НОМЕР АУДИТОРИИ</label><input id="roomName"
+                                                                                               maxlength="20"
+                                                                                               placeholder="Например, A-105" required>
+                        </div>
+                        <div class="field"><label for="roomBuilding">КОРПУС</label><select id="roomBuilding" required>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select></div>
+                        <div class="field"><label for="roomFloor">ЭТАЖ</label><input id="roomFloor" max="20"
+                                                                                     min="1" required type="number"
+                                                                                     value="1"></div>
+                        <div class="field"><label for="roomCapacity">ВМЕСТИМОСТЬ</label><input id="roomCapacity"
+                                                                                               max="1000" min="1"
+                                                                                               placeholder="30"
+                                                                                               required
+                                                                                               type="number"></div>
+                        <div class="field"><label for="roomDesc">ТИП / ОПИСАНИЕ</label><input id="roomDesc"
+                                                                                              maxlength="80"
+                                                                                              placeholder="Учебная аудитория" required>
+                        </div>
+                        <div class="field"><label for="roomEquipment">ОБОРУДОВАНИЕ</label><input id="roomEquipment"
+                                                                                                 placeholder="Проектор, Интерактивная доска, Компьютеры, Акустическая система, Оборудование для видеоконференций">
+                        </div>
+                        <div class="room-admin-actions">
+                            <button class="btn" id="saveRoomBtn" type="submit">Добавить аудиторию</button>
+                            <button class="btn btn-soft hidden" id="cancelRoomEdit" onclick="resetRoomForm()"
+                                    type="button">Отмена
+                            </button>
+                        </div>
                     </form>
-                    <div class="table-wrap"><table class="admin-rooms-table"><thead><tr><th>Аудитория</th><th>Корпус / этаж</th><th>Мест</th><th>Описание</th><th>Оборудование</th><th>Действия</th></tr></thead><tbody id="adminRooms"></tbody></table></div>
+                    <div class="table-wrap">
+                        <table class="admin-rooms-table">
+                            <thead>
+                            <tr>
+                                <th>Аудитория</th>
+                                <th>Корпус / этаж</th>
+                                <th>Мест</th>
+                                <th>Описание</th>
+                                <th>Оборудование</th>
+                                <th>Действия</th>
+                            </tr>
+                            </thead>
+                            <tbody id="adminRooms"></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div class="panel">
-                    <div class="panel-title"><div><h2>Все бронирования</h2><p>Фильтры по дате, аудитории, пользователю и статусу, экспорт CSV.</p></div></div>
+                    <div class="panel-title">
+                        <div><h2>Все бронирования</h2>
+                            <p>Фильтры по дате, аудитории, пользователю и статусу, экспорт CSV.</p></div>
+                    </div>
                     <div class="admin-filters">
-                        <div class="field"><label>ДАТА</label><input type="date" id="adminFilterDate"></div>
-                        <div class="field"><label>АУДИТОРИЯ</label><select id="adminFilterRoom"><option value="">Все</option></select></div>
-                        <div class="field"><label>ПОЛЬЗОВАТЕЛЬ</label><select id="adminFilterUser"><option value="">Все пользователи</option></select></div>
+                        <div class="field"><label>ДАТА</label><input id="adminFilterDate" type="date"></div>
+                        <div class="field"><label>АУДИТОРИЯ</label><select id="adminFilterRoom">
+                            <option value="">Все</option>
+                        </select></div>
+                        <div class="field"><label>ПОЛЬЗОВАТЕЛЬ</label><select id="adminFilterUser">
+                            <option value="">Все пользователи</option>
+                        </select></div>
                         <div class="field"><label>СТАТУС</label>
                             <select id="adminFilterStatus">
                                 <option value="">Все</option>
@@ -167,27 +432,89 @@
                                 <option value="cancelled">Отменённые</option>
                             </select>
                         </div>
-                        <button class="btn" type="button" id="adminApplyFilters">Применить</button>
-                        <button class="btn btn-soft" type="button" id="adminResetFilters">Сбросить</button>
-                        <button class="btn" type="button" id="adminExportCsv">Экспорт CSV</button>
+                        <button class="btn" id="adminApplyFilters" type="button">Применить</button>
+                        <button class="btn btn-soft" id="adminResetFilters" type="button">Сбросить</button>
+                        <button class="btn" id="adminExportCsv" type="button">Экспорт CSV</button>
                     </div>
-                    <div class="table-wrap"><table><thead><tr><th>Пользователь</th><th>Аудитория</th><th>Дата</th><th>Время</th><th>Статус</th><th>Действие</th></tr></thead><tbody id="allBookings"></tbody></table></div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Пользователь</th>
+                                <th>Аудитория</th>
+                                <th>Дата</th>
+                                <th>Время</th>
+                                <th>Статус</th>
+                                <th>Действие</th>
+                            </tr>
+                            </thead>
+                            <tbody id="allBookings"></tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
-        </div></main></div>
+        </div>
+    </main>
+</div>
 
-<div class="modal-bg hidden" id="modal"><div class="modal">
-    <h3>Новое бронирование</h3>
-    <p id="modalRoom">Выберите дату и временной интервал.</p>
-    <div id="modalFreeSlots" class="modal-free-slots"></div>
-    <div class="modal-grid">
-        <div class="field"><label>ДАТА</label><input type="date" id="bookingDate"></div>
-        <div class="field"><label>НАЧАЛО</label><select id="startTime"><option>09:00</option><option>09:30</option><option>10:00</option><option>10:30</option><option>11:00</option><option>11:30</option><option>12:00</option><option>12:30</option><option>13:00</option><option>13:30</option><option>14:00</option><option>14:30</option><option>15:00</option><option>15:30</option><option>16:00</option><option>16:30</option><option>17:00</option><option>17:30</option></select></div>
-        <div class="field"><label>ОКОНЧАНИЕ</label><select id="endTime"><option>09:30</option><option>10:00</option><option>10:30</option><option>11:00</option><option>11:30</option><option>12:00</option><option>12:30</option><option>13:00</option><option>13:30</option><option>14:00</option><option>14:30</option><option>15:00</option><option>15:30</option><option>16:00</option><option>16:30</option><option>17:00</option><option>17:30</option><option>18:00</option></select></div>
-        <div class="field"><label>КОММЕНТАРИЙ</label><input id="bookingComment" placeholder="Цель бронирования"></div>
+<div class="modal-bg hidden" id="modal">
+    <div class="modal">
+        <h3>Новое бронирование</h3>
+        <p id="modalRoom">Выберите дату и временной интервал.</p>
+        <div class="modal-free-slots" id="modalFreeSlots"></div>
+        <div class="modal-grid">
+            <div class="field"><label>ДАТА</label><input id="bookingDate" type="date"></div>
+            <div class="field"><label>НАЧАЛО</label><select id="startTime">
+                <option>09:00</option>
+                <option>09:30</option>
+                <option>10:00</option>
+                <option>10:30</option>
+                <option>11:00</option>
+                <option>11:30</option>
+                <option>12:00</option>
+                <option>12:30</option>
+                <option>13:00</option>
+                <option>13:30</option>
+                <option>14:00</option>
+                <option>14:30</option>
+                <option>15:00</option>
+                <option>15:30</option>
+                <option>16:00</option>
+                <option>16:30</option>
+                <option>17:00</option>
+                <option>17:30</option>
+            </select></div>
+            <div class="field"><label>ОКОНЧАНИЕ</label><select id="endTime">
+                <option>09:30</option>
+                <option>10:00</option>
+                <option>10:30</option>
+                <option>11:00</option>
+                <option>11:30</option>
+                <option>12:00</option>
+                <option>12:30</option>
+                <option>13:00</option>
+                <option>13:30</option>
+                <option>14:00</option>
+                <option>14:30</option>
+                <option>15:00</option>
+                <option>15:30</option>
+                <option>16:00</option>
+                <option>16:30</option>
+                <option>17:00</option>
+                <option>17:30</option>
+                <option>18:00</option>
+            </select></div>
+            <div class="field"><label>КОММЕНТАРИЙ</label><input id="bookingComment" placeholder="Цель бронирования">
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-soft" onclick="closeModal()">Назад</button>
+            <button class="btn" onclick="confirmBooking()">Подтвердить бронь</button>
+        </div>
     </div>
-    <div class="modal-actions"><button class="btn btn-soft" onclick="closeModal()">Назад</button><button class="btn" onclick="confirmBooking()">Подтвердить бронь</button></div>
-</div></div>
+</div>
 
-<script src="script.js?v=20261118-4"></script></body></html>
+<script src="script.js?v=20261118-4"></script>
+</body>
+</html>

@@ -12,8 +12,8 @@ public sealed class StatsService : IStatsService
     private const int MaxPeriodDays = 366;
 
     private readonly IBookingRepository _bookings;
-    private readonly IRoomRepository _rooms;
     private readonly IClock _clock;
+    private readonly IRoomRepository _rooms;
 
     public StatsService(IBookingRepository bookings, IRoomRepository rooms, IClock clock)
     {
@@ -36,35 +36,21 @@ public sealed class StatsService : IStatsService
         var toDate = today.AddDays(6);
 
         if (!string.IsNullOrWhiteSpace(from) && !ApiParsing.TryParseDate(from, out fromDate))
-        {
             errors["from"] = "Неверный формат даты, ожидается YYYY-MM-DD";
-        }
 
         if (!string.IsNullOrWhiteSpace(to) && !ApiParsing.TryParseDate(to, out toDate))
-        {
             errors["to"] = "Неверный формат даты, ожидается YYYY-MM-DD";
-        }
 
         string? normalizedBuilding = null;
         if (!string.IsNullOrWhiteSpace(building) && !Buildings.TryNormalize(building, out normalizedBuilding))
-        {
             errors["building"] = "Допустимые значения: A, B, C, D";
-        }
 
-        if (errors.Count > 0)
-        {
-            throw ApiException.Validation(errors);
-        }
+        if (errors.Count > 0) throw ApiException.Validation(errors);
 
-        if (toDate < fromDate)
-        {
-            throw ApiException.Validation("to", "Дата окончания не может быть раньше даты начала");
-        }
+        if (toDate < fromDate) throw ApiException.Validation("to", "Дата окончания не может быть раньше даты начала");
 
         if (toDate.DayNumber - fromDate.DayNumber > MaxPeriodDays)
-        {
             throw ApiException.Validation("to", $"Период не должен превышать {MaxPeriodDays} дней");
-        }
 
         var rooms = await _rooms.ListAsync(
             new RoomQuery(normalizedBuilding, null, Array.Empty<Equipment>()),
@@ -142,5 +128,8 @@ public sealed class StatsService : IStatsService
         return new LoadBucketDto(active.Count, cancelled, bookedMinutes, totalMinutes, utilization);
     }
 
-    private static int BookedMinutes(Booking booking) => (int)(booking.EndTime - booking.StartTime).TotalMinutes;
+    private static int BookedMinutes(Booking booking)
+    {
+        return (int)(booking.EndTime - booking.StartTime).TotalMinutes;
+    }
 }

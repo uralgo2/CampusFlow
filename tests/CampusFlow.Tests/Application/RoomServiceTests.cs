@@ -38,10 +38,14 @@ public sealed class RoomServiceTests
     {
         var fixture = CreateFixture();
 
-        await ThrowsApiErrorAsync(() => fixture.Service.GetRoomsAsync("Z", null, null, CancellationToken.None), 400, ErrorCodes.Validation);
-        await ThrowsApiErrorAsync(() => fixture.Service.GetRoomsAsync(null, 0, null, CancellationToken.None), 400, ErrorCodes.Validation);
-        await ThrowsApiErrorAsync(() => fixture.Service.GetRoomsAsync(null, -1, null, CancellationToken.None), 400, ErrorCodes.Validation);
-        await ThrowsApiErrorAsync(() => fixture.Service.GetRoomsAsync(null, null, "monitor", CancellationToken.None), 400, ErrorCodes.Validation);
+        await ThrowsApiErrorAsync(() => fixture.Service.GetRoomsAsync("Z", null, null, CancellationToken.None), 400,
+            ErrorCodes.Validation);
+        await ThrowsApiErrorAsync(() => fixture.Service.GetRoomsAsync(null, 0, null, CancellationToken.None), 400,
+            ErrorCodes.Validation);
+        await ThrowsApiErrorAsync(() => fixture.Service.GetRoomsAsync(null, -1, null, CancellationToken.None), 400,
+            ErrorCodes.Validation);
+        await ThrowsApiErrorAsync(() => fixture.Service.GetRoomsAsync(null, null, "monitor", CancellationToken.None),
+            400, ErrorCodes.Validation);
     }
 
     [Test]
@@ -49,7 +53,8 @@ public sealed class RoomServiceTests
     {
         var fixture = CreateFixture();
 
-        await ThrowsApiErrorAsync(() => fixture.Service.GetRoomAsync(999, CancellationToken.None), 404, ErrorCodes.RoomNotFound);
+        await ThrowsApiErrorAsync(() => fixture.Service.GetRoomAsync(999, CancellationToken.None), 404,
+            ErrorCodes.RoomNotFound);
     }
 
     [Test]
@@ -58,7 +63,7 @@ public sealed class RoomServiceTests
         var fixture = CreateFixture();
         var tomorrow = Fixtures.Today.AddDays(1);
 
-        fixture.Data.Db.AddBooking(fixture.Data.A101.Id, 1, tomorrow, "10:00", "11:30", BookingStatus.Active);
+        fixture.Data.Db.AddBooking(fixture.Data.A101.Id, 1, tomorrow, "10:00", "11:30");
         fixture.Data.Db.AddBooking(fixture.Data.A101.Id, 1, tomorrow, "15:00", "16:00", BookingStatus.Cancelled);
 
         var response = await fixture.Service.GetFreeSlotsAsync(
@@ -168,7 +173,8 @@ public sealed class RoomServiceTests
         var fixture = CreateFixture();
 
         await ThrowsApiErrorAsync(
-            () => fixture.Service.UpdateRoomAsync(999, new UpdateRoomRequest("X-1", "A", 1, 10, Array.Empty<string>()), CancellationToken.None),
+            () => fixture.Service.UpdateRoomAsync(999, new UpdateRoomRequest("X-1", "A", 1, 10, Array.Empty<string>()),
+                CancellationToken.None),
             404,
             ErrorCodes.RoomNotFound);
     }
@@ -182,8 +188,7 @@ public sealed class RoomServiceTests
             1,
             Fixtures.Today.AddDays(1),
             "10:00",
-            "11:00",
-            BookingStatus.Active);
+            "11:00");
 
         await ThrowsApiErrorAsync(
             () => fixture.Service.DeleteRoomAsync(fixture.Data.A101.Id, CancellationToken.None),
@@ -215,7 +220,7 @@ public sealed class RoomServiceTests
         var fixture = CreateFixture();
         var tomorrow = Fixtures.Today.AddDays(1);
 
-        fixture.Data.Db.AddBooking(fixture.Data.A101.Id, 1, tomorrow, "10:00", "10:30", BookingStatus.Active);
+        fixture.Data.Db.AddBooking(fixture.Data.A101.Id, 1, tomorrow, "10:00", "10:30");
 
         var response = await fixture.Service.FindFreeRoomsAsync(
             Fixtures.Iso(tomorrow),

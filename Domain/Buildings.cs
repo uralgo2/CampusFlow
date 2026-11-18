@@ -7,21 +7,15 @@ public static class Buildings
     public static IReadOnlyList<string> All { get; } = new[] { "A", "B", "C", "D" };
 
     /// <summary>
-    /// Приводит корпус к каноническому виду (одна заглавная буква) и проверяет, что он допустим.
+    ///     Приводит корпус к каноническому виду (одна заглавная буква) и проверяет, что он допустим.
     /// </summary>
     public static bool TryNormalize(string? value, out string building)
     {
         building = string.Empty;
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
+        if (string.IsNullOrWhiteSpace(value)) return false;
 
         var candidate = value.Trim().ToUpperInvariant();
-        if (!All.Contains(candidate, StringComparer.Ordinal))
-        {
-            return false;
-        }
+        if (!All.Contains(candidate, StringComparer.Ordinal)) return false;
 
         building = candidate;
         return true;

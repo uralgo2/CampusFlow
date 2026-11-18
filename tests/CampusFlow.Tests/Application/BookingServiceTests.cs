@@ -203,7 +203,8 @@ public sealed class BookingServiceTests
     public async Task CancelOwn_MarksBookingCancelled()
     {
         var fixture = CreateFixture();
-        var created = await fixture.Service.CreateAsync(Request(fixture.Data.A101, "14:00", "15:00"), CancellationToken.None);
+        var created =
+            await fixture.Service.CreateAsync(Request(fixture.Data.A101, "14:00", "15:00"), CancellationToken.None);
 
         var result = await fixture.Service.CancelOwnAsync(created.Id, CancellationToken.None);
 
@@ -216,7 +217,8 @@ public sealed class BookingServiceTests
     public async Task CancelOwn_ForeignBooking_ThrowsForbidden()
     {
         var fixture = CreateFixture();
-        var created = await fixture.Service.CreateAsync(Request(fixture.Data.A101, "14:00", "15:00"), CancellationToken.None);
+        var created =
+            await fixture.Service.CreateAsync(Request(fixture.Data.A101, "14:00", "15:00"), CancellationToken.None);
         fixture.User.UserId = 2;
         fixture.User.Login = "student2";
 
@@ -232,7 +234,8 @@ public sealed class BookingServiceTests
     public async Task CancelOwn_AlreadyCancelled_ThrowsConflict()
     {
         var fixture = CreateFixture();
-        var created = await fixture.Service.CreateAsync(Request(fixture.Data.A101, "14:00", "15:00"), CancellationToken.None);
+        var created =
+            await fixture.Service.CreateAsync(Request(fixture.Data.A101, "14:00", "15:00"), CancellationToken.None);
         await fixture.Service.CancelOwnAsync(created.Id, CancellationToken.None);
 
         await ThrowsApiErrorAsync(
@@ -256,7 +259,8 @@ public sealed class BookingServiceTests
     public async Task AdminCancel_CancelsAnyBooking()
     {
         var fixture = CreateFixture();
-        var created = await fixture.Service.CreateAsync(Request(fixture.Data.A101, "14:00", "15:00"), CancellationToken.None);
+        var created =
+            await fixture.Service.CreateAsync(Request(fixture.Data.A101, "14:00", "15:00"), CancellationToken.None);
         fixture.User.UserId = 3;
         fixture.User.Login = "admin";
         fixture.User.Role = UserRole.Admin;
@@ -305,7 +309,8 @@ public sealed class BookingServiceTests
 
         var csv = await fixture.Service.ExportCsvAsync(null, null, null, null, CancellationToken.None);
 
-        Contains("id,roomId,roomName,userId,userDisplayName,date,startTime,endTime,status,comment", csv.Content, "нет заголовка CSV");
+        Contains("id,roomId,roomName,userId,userDisplayName,date,startTime,endTime,status,comment", csv.Content,
+            "нет заголовка CSV");
         Contains("A-101", csv.Content, "нет строки с аудиторией");
         Contains("Иван Студентов", csv.Content, "нет имени автора");
         True(csv.FileName.EndsWith(".csv", StringComparison.Ordinal), "имя файла должно заканчиваться на .csv");
@@ -315,16 +320,23 @@ public sealed class BookingServiceTests
     {
         var tomorrow = Fixtures.Today.AddDays(1);
 
-        fixture.Data.Db.AddBooking(fixture.Data.A101.Id, 1, tomorrow, "10:00", "11:00", BookingStatus.Active, "Консультация");
-        fixture.Data.Db.AddBooking(fixture.Data.A101.Id, 1, tomorrow, "12:00", "13:00", BookingStatus.Cancelled, "Отменили");
-        fixture.Data.Db.AddBooking(fixture.Data.B101.Id, 2, tomorrow, "14:00", "15:00", BookingStatus.Active, "Собрание");
+        fixture.Data.Db.AddBooking(fixture.Data.A101.Id, 1, tomorrow, "10:00", "11:00", BookingStatus.Active,
+            "Консультация");
+        fixture.Data.Db.AddBooking(fixture.Data.A101.Id, 1, tomorrow, "12:00", "13:00", BookingStatus.Cancelled,
+            "Отменили");
+        fixture.Data.Db.AddBooking(fixture.Data.B101.Id, 2, tomorrow, "14:00", "15:00", BookingStatus.Active,
+            "Собрание");
     }
 
-    private static CreateBookingRequest Request(Room room, string startTime, string endTime, string? comment = null) =>
-        new(room.Id, Fixtures.Tomorrow(), startTime, endTime, comment);
+    private static CreateBookingRequest Request(Room room, string startTime, string endTime, string? comment = null)
+    {
+        return new CreateBookingRequest(room.Id, Fixtures.Tomorrow(), startTime, endTime, comment);
+    }
 
-    private static CreateBookingRequest Request(int roomId, string startTime, string endTime) =>
-        new(roomId, Fixtures.Tomorrow(), startTime, endTime, null);
+    private static CreateBookingRequest Request(int roomId, string startTime, string endTime)
+    {
+        return new CreateBookingRequest(roomId, Fixtures.Tomorrow(), startTime, endTime, null);
+    }
 
     private static BookingFixture CreateFixture()
     {

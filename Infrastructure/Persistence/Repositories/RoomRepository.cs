@@ -9,17 +9,17 @@ public sealed class RoomRepository : IRoomRepository
 {
     private readonly CampusFlowDbContext _db;
 
-    public RoomRepository(CampusFlowDbContext db) => _db = db;
+    public RoomRepository(CampusFlowDbContext db)
+    {
+        _db = db;
+    }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<Room>> ListAsync(RoomQuery query, CancellationToken cancellationToken)
     {
         var rooms = _db.Rooms.AsNoTracking().AsQueryable();
 
-        if (query.Building is not null)
-        {
-            rooms = rooms.Where(room => room.Building == query.Building);
-        }
+        if (query.Building is not null) rooms = rooms.Where(room => room.Building == query.Building);
 
         if (query.MinCapacity is not null)
         {
@@ -33,18 +33,17 @@ public sealed class RoomRepository : IRoomRepository
             .ThenBy(room => room.Name)
             .ToListAsync(cancellationToken);
 
-        if (query.Equipment.Count == 0)
-        {
-            return list;
-        }
+        if (query.Equipment.Count == 0) return list;
 
         // Оборудование хранится строкой, поэтому пересечение множеств проверяется в памяти.
         return list.Where(room => query.Equipment.All(room.Equipment.Contains)).ToList();
     }
 
     /// <inheritdoc />
-    public Task<Room?> GetAsync(int id, CancellationToken cancellationToken) =>
-        _db.Rooms.FirstOrDefaultAsync(room => room.Id == id, cancellationToken);
+    public Task<Room?> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        return _db.Rooms.FirstOrDefaultAsync(room => room.Id == id, cancellationToken);
+    }
 
     /// <inheritdoc />
     public Task<bool> NameExistsAsync(string name, int? excludeRoomId, CancellationToken cancellationToken)
@@ -57,8 +56,10 @@ public sealed class RoomRepository : IRoomRepository
     }
 
     /// <inheritdoc />
-    public async Task AddAsync(Room room, CancellationToken cancellationToken) =>
+    public async Task AddAsync(Room room, CancellationToken cancellationToken)
+    {
         await _db.Rooms.AddAsync(room, cancellationToken);
+    }
 
     /// <inheritdoc />
     public async Task DeleteAsync(Room room, CancellationToken cancellationToken)
@@ -68,5 +69,8 @@ public sealed class RoomRepository : IRoomRepository
     }
 
     /// <inheritdoc />
-    public Task SaveAsync(CancellationToken cancellationToken) => _db.SaveChangesAsync(cancellationToken);
+    public Task SaveAsync(CancellationToken cancellationToken)
+    {
+        return _db.SaveChangesAsync(cancellationToken);
+    }
 }

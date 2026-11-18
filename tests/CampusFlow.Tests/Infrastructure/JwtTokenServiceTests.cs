@@ -62,7 +62,7 @@ public sealed class JwtTokenServiceTests
     [Test]
     public async Task Validate_ExpiredToken_IsRejected()
     {
-        var (service, clock) = Create(lifetimeMinutes: 60);
+        var (service, clock) = Create(60);
         var token = service.CreateToken(Student());
 
         clock.Advance(TimeSpan.FromMinutes(61));
@@ -153,13 +153,16 @@ public sealed class JwtTokenServiceTests
             clock));
     }
 
-    private static User Student() => new()
+    private static User Student()
     {
-        Id = 1,
-        Login = "student1",
-        DisplayName = "Иван Студентов",
-        Role = UserRole.Student
-    };
+        return new User
+        {
+            Id = 1,
+            Login = "student1",
+            DisplayName = "Иван Студентов",
+            Role = UserRole.Student
+        };
+    }
 
     private static (JwtTokenService Service, FakeClock Clock) Create(
         int lifetimeMinutes = 60,
@@ -181,8 +184,10 @@ public sealed class JwtTokenServiceTests
         return (service, clock);
     }
 
-    private static string Encode(byte[] bytes) =>
-        Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+    private static string Encode(byte[] bytes)
+    {
+        return Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+    }
 
     private static byte[] Decode(string value)
     {

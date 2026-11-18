@@ -15,5 +15,8 @@ public sealed class FakeClock : IClock
 
     public DateTime UtcNow { get; set; }
 
-    public void Advance(TimeSpan delta) => UtcNow = UtcNow.Add(delta);
+    public void Advance(TimeSpan delta)
+    {
+        UtcNow = UtcNow.Add(delta);
+    }
 }

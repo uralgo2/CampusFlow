@@ -14,7 +14,10 @@ public sealed class AuthController : ControllerBase
 {
     private readonly IAuthService _auth;
 
-    public AuthController(IAuthService auth) => _auth = auth;
+    public AuthController(IAuthService auth)
+    {
+        _auth = auth;
+    }
 
     /// <summary>Вход по логину и паролю. В MVP пароль совпадает с логином.</summary>
     /// <response code="200">Токен и данные пользователя.</response>
@@ -27,8 +30,10 @@ public sealed class AuthController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<LoginResponse>> Login(
         [FromBody] LoginRequest? request,
-        CancellationToken cancellationToken) =>
-        Ok(await _auth.LoginAsync(request, cancellationToken));
+        CancellationToken cancellationToken)
+    {
+        return Ok(await _auth.LoginAsync(request, cancellationToken));
+    }
 
     /// <summary>Данные пользователя, которому принадлежит токен (удобно для фронтенда).</summary>
     /// <response code="200">Пользователь из токена.</response>
@@ -37,6 +42,8 @@ public sealed class AuthController : ControllerBase
     [Authorize]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<UserDto>> Me(CancellationToken cancellationToken) =>
-        Ok(await _auth.GetCurrentUserAsync(cancellationToken));
+    public async Task<ActionResult<UserDto>> Me(CancellationToken cancellationToken)
+    {
+        return Ok(await _auth.GetCurrentUserAsync(cancellationToken));
+    }
 }

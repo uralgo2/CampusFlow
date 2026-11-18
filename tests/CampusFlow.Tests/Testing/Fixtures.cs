@@ -1,5 +1,6 @@
 using System.Globalization;
 using CampusFlow.Domain;
+using CampusFlow.Tests.Testing.Fakes;
 
 namespace CampusFlow.Tests.Testing;
 
@@ -10,18 +11,27 @@ public static class Fixtures
 
     public static readonly DateTime NowUtc = new(2026, 11, 14, 8, 0, 0, DateTimeKind.Utc);
 
-    public static Fakes.FakeClock Clock() => new(Today, NowUtc);
+    public static FakeClock Clock()
+    {
+        return new FakeClock(Today, NowUtc);
+    }
 
     /// <summary>Дата в формате контракта.</summary>
-    public static string Iso(DateOnly date) => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+    public static string Iso(DateOnly date)
+    {
+        return date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+    }
 
     /// <summary>Завтрашняя дата в формате контракта — основная для тестов бронирования.</summary>
-    public static string Tomorrow() => Iso(Today.AddDays(1));
+    public static string Tomorrow()
+    {
+        return Iso(Today.AddDays(1));
+    }
 
     /// <summary>Три пользователя и две аудитории — минимальный набор для сервисных тестов.</summary>
     public static StandardData Standard()
     {
-        var db = new Fakes.FakeDatabase();
+        var db = new FakeDatabase();
 
         var student1 = db.AddUser(1, "student1", "Иван Студентов", UserRole.Student);
         var student2 = db.AddUser(2, "student2", "Мария Студентова", UserRole.Student);
@@ -34,7 +44,7 @@ public static class Fixtures
     }
 
     public sealed record StandardData(
-        Fakes.FakeDatabase Db,
+        FakeDatabase Db,
         User Student1,
         User Student2,
         User Admin,

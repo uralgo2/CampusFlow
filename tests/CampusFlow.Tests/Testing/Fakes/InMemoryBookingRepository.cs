@@ -8,7 +8,10 @@ public sealed class InMemoryBookingRepository : IBookingRepository
 {
     private readonly FakeDatabase _db;
 
-    public InMemoryBookingRepository(FakeDatabase db) => _db = db;
+    public InMemoryBookingRepository(FakeDatabase db)
+    {
+        _db = db;
+    }
 
     public Task<IReadOnlyList<Booking>> ListForRoomAndDateAsync(
         int roomId,
@@ -99,9 +102,11 @@ public sealed class InMemoryBookingRepository : IBookingRepository
         return Task.FromResult(hasConflict);
     }
 
-    public Task<int> CountActiveForRoomAsync(int roomId, CancellationToken cancellationToken) =>
-        Task.FromResult(_db.Bookings.Count(booking =>
+    public Task<int> CountActiveForRoomAsync(int roomId, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(_db.Bookings.Count(booking =>
             booking.RoomId == roomId && booking.Status == BookingStatus.Active));
+    }
 
     public Task<Booking> AddAsync(Booking booking, CancellationToken cancellationToken)
     {
@@ -110,7 +115,10 @@ public sealed class InMemoryBookingRepository : IBookingRepository
         return Task.FromResult(Attach(booking));
     }
 
-    public Task SaveAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task SaveAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
 
     private Booking Attach(Booking booking)
     {

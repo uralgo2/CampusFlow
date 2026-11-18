@@ -60,9 +60,12 @@ public sealed class RoomRequestValidatorTests
     [Test]
     public void Validate_FloorAndCapacityLimits_AreChecked()
     {
-        ThrowsApiError(() => RoomRequestValidator.Validate("X-1", "A", 0, 10, Array.Empty<string>()), 400, ErrorCodes.Validation);
-        ThrowsApiError(() => RoomRequestValidator.Validate("X-1", "A", 1, 0, Array.Empty<string>()), 400, ErrorCodes.Validation);
-        ThrowsApiError(() => RoomRequestValidator.Validate("X-1", "A", 1, -5, Array.Empty<string>()), 400, ErrorCodes.Validation);
+        ThrowsApiError(() => RoomRequestValidator.Validate("X-1", "A", 0, 10, Array.Empty<string>()), 400,
+            ErrorCodes.Validation);
+        ThrowsApiError(() => RoomRequestValidator.Validate("X-1", "A", 1, 0, Array.Empty<string>()), 400,
+            ErrorCodes.Validation);
+        ThrowsApiError(() => RoomRequestValidator.Validate("X-1", "A", 1, -5, Array.Empty<string>()), 400,
+            ErrorCodes.Validation);
     }
 
     [Test]

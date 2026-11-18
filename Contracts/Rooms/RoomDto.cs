@@ -6,7 +6,10 @@ namespace CampusFlow.Contracts.Rooms;
 /// <param name="Building">Корпус: A, B, C или D.</param>
 /// <param name="Floor">Этаж.</param>
 /// <param name="Capacity">Вместимость.</param>
-/// <param name="Equipment">Оборудование: <c>projector</c>, <c>whiteboard</c>, <c>computers</c>, <c>audio</c>, <c>video</c>.</param>
+/// <param name="Equipment">
+///     Оборудование: <c>projector</c>, <c>whiteboard</c>, <c>computers</c>, <c>audio</c>, <c>video</c>
+///     .
+/// </param>
 public sealed record RoomDto(
     int Id,
     string Name,

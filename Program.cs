@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,9 +25,7 @@ var connectionBuilder = new SqliteConnectionStringBuilder(configuredConnection);
 if (!string.IsNullOrWhiteSpace(connectionBuilder.DataSource)
     && !string.Equals(connectionBuilder.DataSource, ":memory:", StringComparison.OrdinalIgnoreCase)
     && !Path.IsPathRooted(connectionBuilder.DataSource))
-{
     connectionBuilder.DataSource = Path.Combine(builder.Environment.ContentRootPath, connectionBuilder.DataSource);
-}
 
 builder.Services.AddDbContext<CampusFlowDbContext>(options => options.UseSqlite(connectionBuilder.ToString()));
 
@@ -94,9 +91,11 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "JWT-токен, полученный в POST /api/auth/login"
+        Description = "Введите JWT-токен"
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -104,17 +103,18 @@ builder.Services.AddSwaggerGen(options =>
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
             },
             Array.Empty<string>()
         }
     });
 
     var xmlPath = Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
-    if (File.Exists(xmlPath))
-    {
-        options.IncludeXmlComments(xmlPath);
-    }
+    if (File.Exists(xmlPath)) options.IncludeXmlComments(xmlPath);
 });
 
 var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
@@ -122,11 +122,9 @@ builder.Services.Configure<JwtOptions>(jwtSection);
 
 var jwtKey = jwtSection["Key"];
 if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < JwtOptions.MinimumKeyLength)
-{
     throw new InvalidOperationException(
         $"Jwt:Key должен быть задан и содержать минимум {JwtOptions.MinimumKeyLength} символов. " +
         "Измените appsettings.json или задайте переменную окружения Jwt__Key.");
-}
 builder.Services
     .AddAuthentication(JwtAuthenticationHandler.SchemeName)
     .AddScheme<AuthenticationSchemeOptions, JwtAuthenticationHandler>(
@@ -153,10 +151,7 @@ app.UseStatusCodePages(async statusCodeContext =>
         _ => null
     };
 
-    if (error is not null)
-    {
-        await HttpErrorWriter.WriteAsync(context, context.Response.StatusCode, error);
-    }
+    if (error is not null) await HttpErrorWriter.WriteAsync(context, context.Response.StatusCode, error);
 });
 
 app.UseCors();
@@ -174,7 +169,7 @@ app.UseSwaggerUI(options =>
 });
 
 
-app.MapGet("/", (req) =>
+app.MapGet("/", req =>
 {
     req.Response.Redirect("/index.html");
     return Task.CompletedTask;
@@ -183,4 +178,3 @@ app.MapControllers();
 await DbInitializer.InitializeAsync(app.Services, app.Logger);
 
 app.Run();
-

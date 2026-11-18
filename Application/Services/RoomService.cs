@@ -11,9 +11,9 @@ namespace CampusFlow.Application.Services;
 /// <inheritdoc />
 public sealed class RoomService : IRoomService
 {
-    private readonly IRoomRepository _rooms;
     private readonly IBookingRepository _bookings;
     private readonly IClock _clock;
+    private readonly IRoomRepository _rooms;
 
     public RoomService(IRoomRepository rooms, IBookingRepository bookings, IClock clock)
     {
@@ -43,13 +43,14 @@ public sealed class RoomService : IRoomService
     }
 
     /// <inheritdoc />
-    public async Task<FreeSlotsResponse> GetFreeSlotsAsync(int roomId, string? date, CancellationToken cancellationToken)
+    public async Task<FreeSlotsResponse> GetFreeSlotsAsync(int roomId, string? date,
+        CancellationToken cancellationToken)
     {
         var room = await _rooms.GetAsync(roomId, cancellationToken)
                    ?? throw ApiException.RoomNotFound(roomId);
         var parsedDate = SlotParser.ParseDate(_clock.Today, date);
 
-        var bookings = await _bookings.ListForRoomAndDateAsync(roomId, parsedDate, activeOnly: true, cancellationToken);
+        var bookings = await _bookings.ListForRoomAndDateAsync(roomId, parsedDate, true, cancellationToken);
         var slots = SchedulePolicy.FreeSlots(bookings.Select(booking => (booking.StartTime, booking.EndTime)))
             .Select(DtoMapper.ToDto)
             .ToList();
@@ -75,11 +76,8 @@ public sealed class RoomService : IRoomService
 
         foreach (var room in candidates)
         {
-            var bookings = await _bookings.ListForRoomAndDateAsync(room.Id, parsedDate, activeOnly: true, cancellationToken);
-            if (!bookings.Any(booking => booking.Overlaps(start, end)))
-            {
-                free.Add(DtoMapper.ToDto(room));
-            }
+            var bookings = await _bookings.ListForRoomAndDateAsync(room.Id, parsedDate, true, cancellationToken);
+            if (!bookings.Any(booking => booking.Overlaps(start, end))) free.Add(DtoMapper.ToDto(room));
         }
 
         return new FreeRoomsResponse(
@@ -92,10 +90,7 @@ public sealed class RoomService : IRoomService
     /// <inheritdoc />
     public async Task<RoomDto> CreateRoomAsync(CreateRoomRequest? request, CancellationToken cancellationToken)
     {
-        if (request is null)
-        {
-            throw ApiException.Validation("body", "Тело запроса обязательно");
-        }
+        if (request is null) throw ApiException.Validation("body", "Тело запроса обязательно");
 
         var values = RoomRequestValidator.Validate(
             request.Name,
@@ -122,15 +117,13 @@ public sealed class RoomService : IRoomService
     }
 
     /// <inheritdoc />
-    public async Task<RoomDto> UpdateRoomAsync(int roomId, UpdateRoomRequest? request, CancellationToken cancellationToken)
+    public async Task<RoomDto> UpdateRoomAsync(int roomId, UpdateRoomRequest? request,
+        CancellationToken cancellationToken)
     {
         var room = await _rooms.GetAsync(roomId, cancellationToken)
                    ?? throw ApiException.RoomNotFound(roomId);
 
-        if (request is null)
-        {
-            throw ApiException.Validation("body", "Тело запроса обязательно");
-        }
+        if (request is null) throw ApiException.Validation("body", "Тело запроса обязательно");
 
         var values = RoomRequestValidator.Validate(
             request.Name,
@@ -159,10 +152,7 @@ public sealed class RoomService : IRoomService
                    ?? throw ApiException.RoomNotFound(roomId);
 
         var activeBookings = await _bookings.CountActiveForRoomAsync(roomId, cancellationToken);
-        if (activeBookings > 0)
-        {
-            throw ApiException.RoomInUse(roomId, activeBookings);
-        }
+        if (activeBookings > 0) throw ApiException.RoomInUse(roomId, activeBookings);
 
         await _rooms.DeleteAsync(room, cancellationToken);
     }
@@ -170,9 +160,7 @@ public sealed class RoomService : IRoomService
     private async Task EnsureNameIsFreeAsync(string name, int? excludeRoomId, CancellationToken cancellationToken)
     {
         if (await _rooms.NameExistsAsync(name, excludeRoomId, cancellationToken))
-        {
             throw ApiException.Validation("name", "Аудитория с таким названием уже существует");
-        }
     }
 
     private static RoomQuery ParseRoomQuery(string? building, int? minCapacity, string? equipment)
@@ -181,45 +169,32 @@ public sealed class RoomService : IRoomService
 
         string? normalizedBuilding = null;
         if (!string.IsNullOrWhiteSpace(building) && !Buildings.TryNormalize(building, out normalizedBuilding))
-        {
             errors["building"] = "Допустимые значения: A, B, C, D";
-        }
 
         if (minCapacity is not null && minCapacity <= 0)
-        {
             errors["minCapacity"] = "Параметр minCapacity должен быть целым числом больше 0";
-        }
 
         var equipmentList = new List<Equipment>();
         if (!string.IsNullOrWhiteSpace(equipment))
         {
             var unknown = new List<string>();
-            foreach (var code in equipment.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-            {
+            foreach (var code in equipment.Split(',',
+                         StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
                 if (EquipmentCatalog.TryParse(code, out var parsed))
                 {
-                    if (!equipmentList.Contains(parsed))
-                    {
-                        equipmentList.Add(parsed);
-                    }
+                    if (!equipmentList.Contains(parsed)) equipmentList.Add(parsed);
                 }
                 else
                 {
                     unknown.Add(code);
                 }
-            }
 
             if (unknown.Count > 0)
-            {
                 errors["equipment"] =
                     $"Неизвестное оборудование: {string.Join(", ", unknown)}. Допустимые значения: {string.Join(", ", EquipmentCatalog.Codes)}";
-            }
         }
 
-        if (errors.Count > 0)
-        {
-            throw ApiException.Validation(errors);
-        }
+        if (errors.Count > 0) throw ApiException.Validation(errors);
 
         return new RoomQuery(normalizedBuilding, minCapacity, equipmentList);
     }

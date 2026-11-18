@@ -15,7 +15,10 @@ public sealed class BookingsController : ControllerBase
 {
     private readonly IBookingService _bookings;
 
-    public BookingsController(IBookingService bookings) => _bookings = bookings;
+    public BookingsController(IBookingService bookings)
+    {
+        _bookings = bookings;
+    }
 
     /// <summary>Создать бронь. Автор брони берётся из токена, поле userId в теле не принимается.</summary>
     /// <response code="201">Бронь создана.</response>
@@ -37,7 +40,7 @@ public sealed class BookingsController : ControllerBase
         return StatusCode(StatusCodes.Status201Created, booking);
     }
 
-    /// <summary>Свои брони; фильтр <paramref name="status"/> необязателен.</summary>
+    /// <summary>Свои брони; фильтр <paramref name="status" /> необязателен.</summary>
     /// <response code="200">Брони текущего пользователя, отсортированные по дате и времени.</response>
     /// <response code="400">Неверный статус.</response>
     /// <response code="401">Нет токена.</response>
@@ -47,8 +50,10 @@ public sealed class BookingsController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<IReadOnlyList<BookingDto>>> GetMine(
         [FromQuery] string? status,
-        CancellationToken cancellationToken) =>
-        Ok(await _bookings.GetMyAsync(status, cancellationToken));
+        CancellationToken cancellationToken)
+    {
+        return Ok(await _bookings.GetMyAsync(status, cancellationToken));
+    }
 
     /// <summary>Отменить свою бронь. Чужую бронь отменяет только администратор через админ-endpoint.</summary>
     /// <response code="200">Бронь отменена, слот снова свободен.</response>
@@ -62,6 +67,8 @@ public sealed class BookingsController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
-    public async Task<ActionResult<CancelBookingResponse>> Cancel(int id, CancellationToken cancellationToken) =>
-        Ok(await _bookings.CancelOwnAsync(id, cancellationToken));
+    public async Task<ActionResult<CancelBookingResponse>> Cancel(int id, CancellationToken cancellationToken)
+    {
+        return Ok(await _bookings.CancelOwnAsync(id, cancellationToken));
+    }
 }

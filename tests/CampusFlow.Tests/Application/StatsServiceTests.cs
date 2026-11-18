@@ -79,12 +79,14 @@ public sealed class StatsServiceTests
         var fixture = CreateFixture();
 
         await ThrowsApiErrorAsync(
-            () => fixture.Service.GetStatsAsync(Fixtures.Iso(Fixtures.Today.AddDays(5)), Fixtures.Iso(Fixtures.Today), null, CancellationToken.None),
+            () => fixture.Service.GetStatsAsync(Fixtures.Iso(Fixtures.Today.AddDays(5)), Fixtures.Iso(Fixtures.Today),
+                null, CancellationToken.None),
             400,
             ErrorCodes.Validation);
 
         await ThrowsApiErrorAsync(
-            () => fixture.Service.GetStatsAsync(Fixtures.Iso(Fixtures.Today), Fixtures.Iso(Fixtures.Today.AddDays(400)), null, CancellationToken.None),
+            () => fixture.Service.GetStatsAsync(Fixtures.Iso(Fixtures.Today), Fixtures.Iso(Fixtures.Today.AddDays(400)),
+                null, CancellationToken.None),
             400,
             ErrorCodes.Validation);
     }
@@ -114,9 +116,9 @@ public sealed class StatsServiceTests
         var a101 = db.AddRoom("A-101", "A", 1, 30, Equipment.Projector);
         var b101 = db.AddRoom("B-101", "B", 1, 40, Equipment.Projector, Equipment.Audio);
 
-        db.AddBooking(a101.Id, student1.Id, Fixtures.Today, "10:00", "11:00", BookingStatus.Active);
+        db.AddBooking(a101.Id, student1.Id, Fixtures.Today, "10:00", "11:00");
         db.AddBooking(b101.Id, student1.Id, Fixtures.Today, "12:00", "13:00", BookingStatus.Cancelled);
-        db.AddBooking(b101.Id, student1.Id, Fixtures.Today.AddDays(1), "13:00", "14:00", BookingStatus.Active);
+        db.AddBooking(b101.Id, student1.Id, Fixtures.Today.AddDays(1), "13:00", "14:00");
 
         var service = new StatsService(
             new InMemoryBookingRepository(db),

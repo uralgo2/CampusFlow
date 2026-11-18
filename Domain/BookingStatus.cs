@@ -17,21 +17,21 @@ public static class BookingStatuses
     public const string Cancelled = "cancelled";
 
     /// <summary>Код статуса для ответа API.</summary>
-    public static string ToCode(BookingStatus status) => status switch
+    public static string ToCode(BookingStatus status)
     {
-        BookingStatus.Active => Active,
-        BookingStatus.Cancelled => Cancelled,
-        _ => throw new ArgumentOutOfRangeException(nameof(status), status, "Неизвестный статус брони")
-    };
+        return status switch
+        {
+            BookingStatus.Active => Active,
+            BookingStatus.Cancelled => Cancelled,
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, "Неизвестный статус брони")
+        };
+    }
 
     /// <summary>Разбор кода статуса без учёта регистра.</summary>
     public static bool TryParse(string? code, out BookingStatus status)
     {
         status = default;
-        if (string.IsNullOrWhiteSpace(code))
-        {
-            return false;
-        }
+        if (string.IsNullOrWhiteSpace(code)) return false;
 
         switch (code.Trim().ToLowerInvariant())
         {

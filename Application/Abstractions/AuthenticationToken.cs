@@ -34,8 +34,14 @@ public sealed class TokenValidationOutcome
     public string? Error { get; }
 
     /// <summary>Успешная проверка.</summary>
-    public static TokenValidationOutcome Success(AuthenticationToken identity) => new(identity, null);
+    public static TokenValidationOutcome Success(AuthenticationToken identity)
+    {
+        return new TokenValidationOutcome(identity, null);
+    }
 
     /// <summary>Отказ с причиной.</summary>
-    public static TokenValidationOutcome Failure(string error) => new(null, error);
+    public static TokenValidationOutcome Failure(string error)
+    {
+        return new TokenValidationOutcome(null, error);
+    }
 }

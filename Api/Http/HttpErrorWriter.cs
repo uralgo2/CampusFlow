@@ -14,10 +14,7 @@ public static class HttpErrorWriter
         ErrorResponse error,
         CancellationToken cancellationToken = default)
     {
-        if (context.Response.HasStarted)
-        {
-            return;
-        }
+        if (context.Response.HasStarted) return;
 
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/json; charset=utf-8";

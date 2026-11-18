@@ -6,8 +6,8 @@ namespace CampusFlow.Tests.Testing.Fakes;
 /// <summary>Общее «хранилище» для in-memory репозиториев: списки вместо таблиц EF Core.</summary>
 public sealed class FakeDatabase
 {
-    private int _nextRoomId = 1;
     private int _nextBookingId = 1;
+    private int _nextRoomId = 1;
 
     public List<User> Users { get; } = new();
 

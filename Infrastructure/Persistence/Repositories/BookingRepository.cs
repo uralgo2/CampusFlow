@@ -9,7 +9,10 @@ public sealed class BookingRepository : IBookingRepository
 {
     private readonly CampusFlowDbContext _db;
 
-    public BookingRepository(CampusFlowDbContext db) => _db = db;
+    public BookingRepository(CampusFlowDbContext db)
+    {
+        _db = db;
+    }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<Booking>> ListForRoomAndDateAsync(
@@ -22,10 +25,7 @@ public sealed class BookingRepository : IBookingRepository
             .AsNoTracking()
             .Where(booking => booking.RoomId == roomId && booking.Date == date);
 
-        if (activeOnly)
-        {
-            query = query.Where(booking => booking.Status == BookingStatus.Active);
-        }
+        if (activeOnly) query = query.Where(booking => booking.Status == BookingStatus.Active);
 
         return await query.OrderBy(booking => booking.StartTime).ToListAsync(cancellationToken);
     }
@@ -117,11 +117,13 @@ public sealed class BookingRepository : IBookingRepository
     }
 
     /// <inheritdoc />
-    public Task<Booking?> GetAsync(int id, CancellationToken cancellationToken) =>
-        _db.Bookings
+    public Task<Booking?> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        return _db.Bookings
             .Include(booking => booking.Room)
             .Include(booking => booking.User)
             .FirstOrDefaultAsync(booking => booking.Id == id, cancellationToken);
+    }
 
     /// <inheritdoc />
     public async Task<bool> HasConflictAsync(
@@ -149,10 +151,12 @@ public sealed class BookingRepository : IBookingRepository
     }
 
     /// <inheritdoc />
-    public Task<int> CountActiveForRoomAsync(int roomId, CancellationToken cancellationToken) =>
-        _db.Bookings.CountAsync(
+    public Task<int> CountActiveForRoomAsync(int roomId, CancellationToken cancellationToken)
+    {
+        return _db.Bookings.CountAsync(
             booking => booking.RoomId == roomId && booking.Status == BookingStatus.Active,
             cancellationToken);
+    }
 
     /// <inheritdoc />
     public async Task<Booking> AddAsync(Booking booking, CancellationToken cancellationToken)
@@ -163,5 +167,8 @@ public sealed class BookingRepository : IBookingRepository
     }
 
     /// <inheritdoc />
-    public Task SaveAsync(CancellationToken cancellationToken) => _db.SaveChangesAsync(cancellationToken);
+    public Task SaveAsync(CancellationToken cancellationToken)
+    {
+        return _db.SaveChangesAsync(cancellationToken);
+    }
 }

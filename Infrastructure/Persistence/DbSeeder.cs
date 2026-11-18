@@ -1,4 +1,3 @@
-
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -7,7 +6,7 @@ using CampusFlow.Domain;
 namespace CampusFlow.Infrastructure.Persistence;
 
 /// <summary>
-/// Загрузка тестовых данных из JSON-файла в базу данных.
+///     Загрузка тестовых данных из JSON-файла в базу данных.
 /// </summary>
 public static class DbSeeder
 {
@@ -23,7 +22,7 @@ public static class DbSeeder
     };
 
     /// <summary>
-    /// Загружает тестовые данные из JSON и сохраняет их в SQLite.
+    ///     Загружает тестовые данные из JSON и сохраняет их в SQLite.
     /// </summary>
     public static async Task SeedAsync(
         CampusFlowDbContext db,
@@ -35,10 +34,8 @@ public static class DbSeeder
             SeedFileName);
 
         if (!File.Exists(filePath))
-        {
             throw new FileNotFoundException(
                 $"Файл тестовых данных не найден: {filePath}");
-        }
 
         await using var stream = File.OpenRead(filePath);
 
@@ -48,19 +45,15 @@ public static class DbSeeder
             cancellationToken);
 
         if (seedData is null)
-        {
             throw new InvalidDataException(
                 "Не удалось прочитать JSON seed-файл.");
-        }
 
         // Проверяем наличие всех разделов.
         if (seedData.Users.Count == 0 ||
             seedData.Rooms.Count == 0 ||
             seedData.Bookings.Count == 0)
-        {
             throw new InvalidDataException(
                 "JSON seed-файл содержит пустые разделы.");
-        }
 
         // Загружаем пользователей.
         db.Users.AddRange(

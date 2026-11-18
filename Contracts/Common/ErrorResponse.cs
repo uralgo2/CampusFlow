@@ -9,4 +9,5 @@ namespace CampusFlow.Contracts.Common;
 public sealed record ErrorResponse(
     string Code,
     string Message,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] object? Details = null);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    object? Details = null);
