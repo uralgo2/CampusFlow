@@ -281,7 +281,7 @@ Api/                           контроллеры, JWT-обработчик,
 Application/                   сервисы, валидация, разбор дат и времени, абстракции репозиториев
 Contracts/                     DTO запросов и ответов
 Domain/                        сущности, SchedulePolicy, справочники
-Infrastructure/                EF Core + SQLite, репозитории, seed, JwtTokenService
+Infrastructure/                EF Core + SQLite, репозитории, seed
 tests/CampusFlow.Tests/        юнит-тесты, fakes, встроенный раннер
 wwwroot/                       Веб-интерфейс
 ```
