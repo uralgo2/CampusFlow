@@ -1,6 +1,7 @@
 using System.Reflection;
+using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
-using CampusFlow.Api.Authentication;
 using CampusFlow.Api.Http;
 using CampusFlow.Api.Middleware;
 using CampusFlow.Api.Serialization;
@@ -8,14 +9,16 @@ using CampusFlow.Application.Abstractions;
 using CampusFlow.Application.Errors;
 using CampusFlow.Application.Services;
 using CampusFlow.Contracts.Common;
+using CampusFlow.Domain;
 using CampusFlow.Infrastructure.Persistence;
 using CampusFlow.Infrastructure.Persistence.Repositories;
 using CampusFlow.Infrastructure.Security;
 using CampusFlow.Infrastructure.Time;
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -125,11 +128,90 @@ if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < JwtOptions.MinimumKeyLe
     throw new InvalidOperationException(
         $"Jwt:Key должен быть задан и содержать минимум {JwtOptions.MinimumKeyLength} символов. " +
         "Измените appsettings.json или задайте переменную окружения Jwt__Key.");
+
+var jwtIssuer = jwtSection[nameof(JwtOptions.Issuer)] ?? "CampusFlow";
+var jwtAudience = jwtSection[nameof(JwtOptions.Audience)] ?? "CampusFlow";
+var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+
 builder.Services
-    .AddAuthentication(JwtAuthenticationHandler.SchemeName)
-    .AddScheme<AuthenticationSchemeOptions, JwtAuthenticationHandler>(
-        JwtAuthenticationHandler.SchemeName,
-        _ => { });
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        // Оставляем имена claims из JWT без автоматического преобразования.
+        options.MapInboundClaims = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtIssuer,
+            ValidateAudience = true,
+            ValidAudience = jwtAudience,
+            ValidateLifetime = true,
+            RequireExpirationTime = true,
+            RequireSignedTokens = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = signingKey,
+            ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha256 },
+            ClockSkew = TimeSpan.Zero
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                // Перечитываем пользователя из БД: роль всегда актуальна,
+                // а удалённый пользователь не сможет использовать старый токен.
+                var subject = context.Principal?.FindFirst("sub")?.Value;
+                if (!int.TryParse(subject, out var userId))
+                {
+                    context.Fail("В токене отсутствует корректный идентификатор пользователя.");
+                    return;
+                }
+
+                var users = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+                var user = await users.GetByIdAsync(userId, context.HttpContext.RequestAborted);
+                if (user is null)
+                {
+                    context.Fail("Пользователь из токена не найден.");
+                    return;
+                }
+
+                var claims = new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.Login),
+                    new Claim(ClaimTypes.Role, UserRoles.ToCode(user.Role)),
+                    new Claim("displayName", user.DisplayName)
+                };
+
+                var identity = new ClaimsIdentity(
+                    claims,
+                    JwtBearerDefaults.AuthenticationScheme,
+                    ClaimTypes.Name,
+                    ClaimTypes.Role);
+
+                context.Principal = new ClaimsPrincipal(identity);
+            },
+            OnChallenge = async context =>
+            {
+                context.HandleResponse();
+                context.Response.Headers.WWWAuthenticate = "Bearer";
+                await HttpErrorWriter.WriteAsync(
+                    context.HttpContext,
+                    StatusCodes.Status401Unauthorized,
+                    new ErrorResponse(
+                        ErrorCodes.Unauthorized,
+                        "Требуется авторизация: передайте заголовок Authorization: Bearer <JWT>"));
+            },
+            OnForbidden = async context =>
+            {
+                await HttpErrorWriter.WriteAsync(
+                    context.HttpContext,
+                    StatusCodes.Status403Forbidden,
+                    new ErrorResponse(ErrorCodes.Forbidden, "Недостаточно прав для выполнения операции"));
+            }
+        };
+    });
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddCors(options =>
@@ -167,7 +249,6 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = "swagger";
     options.DocumentTitle = "CampusFlow API";
 });
-
 
 app.MapGet("/", req =>
 {
