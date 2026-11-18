@@ -55,13 +55,24 @@ function setToken(t) {
 
 /* ---------- HTTP ---------- */
 async function apiRequest(path, options = {}) {
+ const hadToken = Boolean(token);
  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
  if (token) headers.Authorization = 'Bearer ' + token;
+
  const res = await fetch(API_BASE + path, { ...options, headers });
- if (res.status === 401) {
-  setToken(''); currentUserData = null; currentUser = 'guest';
+
+ // 401 при запросе с уже сохранённым токеном означает, что сессия истекла.
+ // 401 на /auth/login — просто неверные учётные данные, а не выход из аккаунта.
+ if (res.status === 401 && hadToken && path !== '/auth/login') {
+  setToken('');
+  currentUserData = null;
+  currentUser = 'guest';
+  myBookings = [];
+  allBookings = [];
+  adminStats = null;
   handleUnauthorized();
  }
+
  return res;
 }
 async function apiJson(path, options = {}) {
@@ -92,11 +103,27 @@ function apiErrorMessage(err) {
  return err?.message || 'Произошла ошибка';
 }
 function handleUnauthorized() {
- $('loginOpenBtn').classList.remove('hidden');
- $('avatar').classList.add('hidden');
- $('userMeta').classList.add('hidden');
- $('logoutBtn').classList.add('hidden');
- document.querySelector('[data-page="admin"]').classList.add('hidden');
+ // Обновляем интерфейс целиком, чтобы после 401 не оставались данные
+ // предыдущего пользователя и закрытые админские разделы.
+ if ($('modal')) $('modal').classList.add('hidden');
+ if ($('authScreen')) $('authScreen').classList.add('hidden');
+
+ setUser();
+
+ const currentPage = document.querySelector('.page.active');
+ if (currentPage && currentPage.id !== 'overview') {
+  document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+  $('overview').classList.add('active');
+  document.querySelectorAll('.nav button').forEach(button => {
+   button.classList.toggle('active', button.dataset.page === 'overview');
+  });
+  $('crumb').textContent = 'Обзор';
+ }
+
+ if ($('statsResult')) {
+  $('statsResult').innerHTML = '<div class="empty">Войдите под учётной записью администратора, чтобы просмотреть статистику.</div>';
+ }
+ renderAll();
  toast('Сессия истекла. Войдите снова.');
 }
 
@@ -654,147 +681,145 @@ $('roomForm').addEventListener('submit', async e => {
 
 /* ---------- админ: статистика ---------- */
 async function loadAdminStats() {
- if (!isAdmin()) return;
+ if (!isAdmin()) {
+  $('statsResult').innerHTML = '<div class="empty">Статистика доступна только администратору.</div>';
+  return;
+ }
+
  const from = $('statsFrom').value;
- const to   = $('statsTo').value;
+ const to = $('statsTo').value;
  const building = $('statsBuilding').value;
+
+ if (from && to && from > to) {
+  $('statsResult').innerHTML = '<div class="stats-error">Начальная дата не может быть позже конечной.</div>';
+  return;
+ }
+
+ const button = $('statsLoadBtn');
+ button.disabled = true;
+ button.textContent = 'Загрузка…';
+ $('statsResult').innerHTML = '<div class="empty">Загружаем статистику…</div>';
+
  try {
   adminStats = await getAdminStats(from, to, building);
   renderAdminStats();
  } catch (err) {
-  toast(apiErrorMessage(err));
+  console.error('Ошибка загрузки статистики:', err);
+  $('statsResult').innerHTML = `<div class="stats-error">Не удалось загрузить статистику: ${escapeHtml(apiErrorMessage(err))}</div>`;
+ } finally {
+  button.disabled = false;
+  button.textContent = 'Показать';
  }
+}
+
+function getStatValue(object, ...keys) {
+ if (!object || typeof object !== 'object') return undefined;
+ for (const key of keys) {
+  if (object[key] !== undefined && object[key] !== null) return object[key];
+  const actualKey = Object.keys(object).find(k => k.toLowerCase() === key.toLowerCase());
+  if (actualKey && object[actualKey] !== undefined && object[actualKey] !== null) {
+   return object[actualKey];
+  }
+ }
+ return undefined;
 }
 
 function formatHours(minutes) {
  return `${(Number(minutes || 0) / 60).toFixed(1)} ч`;
 }
 
-function renderLoadBucket(load = {}) {
+function renderLoadBucket(item = {}) {
+ // API может вернуть Load как вложенный объект или показатели непосредственно в строке.
+ const load = getStatValue(item, 'load', 'Load') || item;
  return {
-  active: Number(load.activeBookings || 0),
-  cancelled: Number(load.cancelledBookings || 0),
-  booked: Number(load.bookedMinutes || 0),
-  total: Number(load.totalMinutes || 0),
-  utilization: Number(load.utilizationPercent || 0)
+  active: Number(getStatValue(load, 'activeBookings', 'ActiveBookings') || 0),
+  cancelled: Number(getStatValue(load, 'cancelledBookings', 'CancelledBookings') || 0),
+  booked: Number(getStatValue(load, 'bookedMinutes', 'BookedMinutes') || 0),
+  total: Number(getStatValue(load, 'totalMinutes', 'TotalMinutes') || 0),
+  utilization: Number(getStatValue(load, 'utilizationPercent', 'UtilizationPercent') || 0)
  };
 }
 
-function renderStatsTable(headers, rows) {
- if (!rows.length) {
-  return '<div class="empty">Данных за выбранный период нет</div>';
- }
+function renderStatsTable(headers, rows, emptyText = 'Данных за выбранный период нет') {
+ if (!rows.length) return `<div class="empty">${emptyText}</div>`;
 
  return `
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr>
-                </thead>
-                <tbody>
-                    ${rows.join('')}
-                </tbody>
-            </table>
-        </div>`;
+  <div class="table-wrap">
+   <table class="stats-table">
+    <thead><tr>${headers.map(header => `<th>${escapeHtml(header)}</th>`).join('')}</tr></thead>
+    <tbody>${rows.join('')}</tbody>
+   </table>
+  </div>`;
 }
 
 function renderAdminStats() {
  const container = $('statsResult');
+ if (!container) return;
 
  if (!adminStats) {
-  container.innerHTML =
-      '<div class="empty">Выберите период и нажмите «Показать»</div>';
+  container.innerHTML = '<div class="empty">Выберите период и нажмите «Показать»</div>';
   return;
  }
 
- const totals = renderLoadBucket(adminStats.totals);
+ // Поддерживаем как прямой ответ API, так и обёртку { data: {...} }.
+ const data = getStatValue(adminStats, 'data') || adminStats;
+ const totals = renderLoadBucket(getStatValue(data, 'totals', 'Totals') || {});
+ const byDay = getStatValue(data, 'byDay', 'ByDay') || [];
+ const byBuilding = getStatValue(data, 'byBuilding', 'ByBuilding') || [];
+ const topRooms = getStatValue(data, 'topRooms', 'TopRooms') || [];
 
- // Общие показатели за период
  const totalsHtml = `
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-label">Активные бронирования</div>
-                <div class="stat-value">${totals.active}</div>
-            </div>
-            <div class="stat">
-                <div class="stat-label">Отменённые бронирования</div>
-                <div class="stat-value">${totals.cancelled}</div>
-            </div>
-            <div class="stat">
-                <div class="stat-label">Занятое время</div>
-                <div class="stat-value">${formatHours(totals.booked)}</div>
-            </div>
-            <div class="stat">
-                <div class="stat-label">Загрузка аудиторий</div>
-                <div class="stat-value">${totals.utilization.toFixed(1)}%</div>
-            </div>
-        </div>`;
+  <div class="stats">
+   <div class="stat"><div class="stat-label">Активные бронирования</div><div class="stat-value">${totals.active}</div><div class="stat-note">Не отменены</div></div>
+   <div class="stat"><div class="stat-label">Отменённые бронирования</div><div class="stat-value">${totals.cancelled}</div><div class="stat-note">За выбранный период</div></div>
+   <div class="stat"><div class="stat-label">Занятое время</div><div class="stat-value">${formatHours(totals.booked)}</div><div class="stat-note">Суммарно</div></div>
+   <div class="stat"><div class="stat-label">Загрузка аудиторий</div><div class="stat-value">${totals.utilization.toFixed(1)}%</div><div class="stat-note">От доступного времени</div></div>
+  </div>`;
 
- // Загрузка по дням
- const dailyRows = (adminStats.byDay || []).map(item => {
-  const load = renderLoadBucket(item.load);
-
+ const dailyRows = byDay.map(item => {
+  const load = renderLoadBucket(item);
+  const date = getStatValue(item, 'date', 'Date') || '—';
   return `<tr>
-            <td>${escapeHtml(item.date)}</td>
-            <td>${load.active}</td>
-            <td>${load.cancelled}</td>
-            <td>${formatHours(load.booked)}</td>
-            <td>${load.utilization.toFixed(1)}%</td>
-        </tr>`;
+   <td>${escapeHtml(date)}</td><td>${load.active}</td><td>${load.cancelled}</td>
+   <td>${formatHours(load.booked)}</td><td>${load.utilization.toFixed(1)}%</td>
+  </tr>`;
  });
 
- // Загрузка по корпусам
- const buildingRows = (adminStats.byBuilding || []).map(item => {
-  const load = renderLoadBucket(item.load);
-
+ const buildingRows = byBuilding.map(item => {
+  const load = renderLoadBucket(item);
   return `<tr>
-            <td>${escapeHtml(item.building)}</td>
-            <td>${Number(item.rooms || 0)}</td>
-            <td>${load.active}</td>
-            <td>${formatHours(load.booked)}</td>
-            <td>${load.utilization.toFixed(1)}%</td>
-        </tr>`;
+   <td>${escapeHtml(getStatValue(item, 'building', 'Building') || '—')}</td>
+   <td>${Number(getStatValue(item, 'rooms', 'Rooms') || 0)}</td>
+   <td>${load.active}</td><td>${formatHours(load.booked)}</td>
+   <td>${load.utilization.toFixed(1)}%</td>
+  </tr>`;
  });
 
- // Самые загруженные аудитории
- const roomRows = (adminStats.topRooms || []).map(item => `
-        <tr>
-            <td>${escapeHtml(item.roomName)}</td>
-            <td>${escapeHtml(item.building)}</td>
-            <td>${Number(item.activeBookings || 0)}</td>
-            <td>${formatHours(item.bookedMinutes)}</td>
-        </tr>`);
+ const roomRows = topRooms.map(item => `
+  <tr>
+   <td>${escapeHtml(getStatValue(item, 'roomName', 'RoomName') || '—')}</td>
+   <td>${escapeHtml(getStatValue(item, 'building', 'Building') || '—')}</td>
+   <td>${Number(getStatValue(item, 'activeBookings', 'ActiveBookings') || 0)}</td>
+   <td>${formatHours(getStatValue(item, 'bookedMinutes', 'BookedMinutes') || 0)}</td>
+  </tr>`);
 
  container.innerHTML = `
-        <div class="stats-section">
-            <h3>Общая статистика</h3>
-            ${totalsHtml}
-        </div>
-
-        <div class="stats-section">
-            <h3>Загрузка по дням</h3>
-            ${renderStatsTable(
-     ['Дата', 'Активные брони', 'Отменённые', 'Занятое время', 'Загрузка'],
-     dailyRows
- )}
-        </div>
-
-        <div class="stats-section">
-            <h3>Загрузка по корпусам</h3>
-            ${renderStatsTable(
-     ['Корпус', 'Аудиторий', 'Активные брони', 'Занятое время', 'Загрузка'],
-     buildingRows
- )}
-        </div>
-
-        <div class="stats-section">
-            <h3>Самые загруженные аудитории</h3>
-            ${renderStatsTable(
-     ['Аудитория', 'Корпус', 'Активные брони', 'Занятое время'],
-     roomRows
- )}
-        </div>
-    `;
+  <section class="stats-section">
+   <h3>Общая статистика</h3>
+   ${totalsHtml}
+  </section>
+  <section class="stats-section">
+   <h3>Загрузка по дням</h3>
+   ${renderStatsTable(['Дата', 'Активные брони', 'Отменённые', 'Занятое время', 'Загрузка'], dailyRows)}
+  </section>
+  <section class="stats-section">
+   <h3>Загрузка по корпусам</h3>
+   ${renderStatsTable(['Корпус', 'Аудиторий', 'Активные брони', 'Занятое время', 'Загрузка'], buildingRows)}
+  </section>
+  <section class="stats-section">
+   <h3>Самые загруженные аудитории</h3>
+   ${renderStatsTable(['Аудитория', 'Корпус', 'Активные брони', 'Занятое время'], roomRows)}
+  </section>`;
 }
 
 $('statsLoadBtn').addEventListener('click', loadAdminStats);
@@ -856,26 +881,40 @@ async function init() {
  $('todayLabel').textContent = new Intl.DateTimeFormat('ru-RU',
      { day: 'numeric', month: 'long', year: 'numeric' }).format(today);
  $('quickDate').value = dateISO(tomorrow);
- $('quickDate').min   = dateISO(today);
+ $('quickDate').min = dateISO(today);
 
- try { await loadRooms(); } catch { toast('Не удалось загрузить каталог аудиторий'); }
-
+ // Сначала проверяем сохранённый токен. Ошибка сети не удаляет токен:
+ // только подтверждённый ответ 401 означает, что сессия недействительна.
  if (token) {
   try {
-   const res = await fetch(API_BASE + '/auth/me', { headers: { Authorization: 'Bearer ' + token } });
-   if (res.ok) {
-    currentUserData = await res.json();
-    currentUser = currentUserData.login;
-   } else {
+   currentUserData = await apiJson('/auth/me');
+   currentUser = currentUserData?.login || 'guest';
+   if (currentUser === 'guest') {
     setToken('');
+    currentUserData = null;
    }
-  } catch { setToken(''); }
+  } catch (err) {
+   if (err.status !== 401) {
+    console.warn('Не удалось проверить сохранённую сессию:', err);
+    toast('Не удалось проверить сессию: сервер недоступен');
+   }
+  }
+ }
+
+ try {
+  await loadRooms();
+ } catch (err) {
+  console.error('Не удалось загрузить аудитории:', err);
+  toast('Не удалось загрузить каталог аудиторий');
  }
 
  if (!isGuest()) {
-  try { await loadMyBookings(); } catch { /* 401 уже обработан */ }
+  try { await loadMyBookings(); }
+  catch (err) { if (err.status !== 401) console.error(err); }
+
   if (isAdmin()) {
-   try { await loadAllBookings(); } catch { /* ignore */ }
+   try { await loadAllBookings(); }
+   catch (err) { if (err.status !== 401) console.error(err); }
   }
  }
 
