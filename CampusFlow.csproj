@@ -20,6 +20,10 @@
         <Content Include="front/**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="Infrastructure/Persistence/SeedData.json" Link="SeedData.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
+    </ItemGroup>
+
     <!-- Проект тестов лежит внутри каталога приложения, поэтому его файлы не входят в сборку бэкенда. -->
     <ItemGroup>
         <Compile Remove="tests/**"/>

@@ -1,0 +1,193 @@
+
+{
+  "users": [
+    {
+      "id": 1,
+      "login": "student1",
+      "displayName": "Иван Студентов",
+      "role": "Student"
+    },
+    {
+      "id": 2,
+      "login": "student2",
+      "displayName": "Мария Студентова",
+      "role": "Student"
+    },
+    {
+      "id": 3,
+      "login": "admin",
+      "displayName": "Администратор Пупкин",
+      "role": "Admin"
+    }
+  ],
+  "rooms": [
+    {
+      "id": 1,
+      "name": "A-101",
+      "building": "A",
+      "floor": 1,
+      "capacity": 30,
+      "equipment": ["Projector", "Whiteboard"]
+    },
+    {
+      "id": 2,
+      "name": "A-102",
+      "building": "A",
+      "floor": 1,
+      "capacity": 20,
+      "equipment": ["Whiteboard"]
+    },
+    {
+      "id": 3,
+      "name": "A-203",
+      "building": "A",
+      "floor": 2,
+      "capacity": 15,
+      "equipment": ["Computers", "Projector"]
+    },
+    {
+      "id": 4,
+      "name": "B-101",
+      "building": "B",
+      "floor": 1,
+      "capacity": 40,
+      "equipment": ["Projector", "Audio"]
+    },
+    {
+      "id": 5,
+      "name": "B-204",
+      "building": "B",
+      "floor": 2,
+      "capacity": 25,
+      "equipment": ["Projector", "Whiteboard", "Audio"]
+    },
+    {
+      "id": 6,
+      "name": "B-305",
+      "building": "B",
+      "floor": 3,
+      "capacity": 10,
+      "equipment": ["Whiteboard"]
+    },
+    {
+      "id": 7,
+      "name": "C-110",
+      "building": "C",
+      "floor": 1,
+      "capacity": 50,
+      "equipment": ["Projector", "Audio", "Video"]
+    },
+    {
+      "id": 8,
+      "name": "C-210",
+      "building": "C",
+      "floor": 2,
+      "capacity": 35,
+      "equipment": ["Computers"]
+    },
+    {
+      "id": 9,
+      "name": "C-301",
+      "building": "C",
+      "floor": 3,
+      "capacity": 12,
+      "equipment": ["Whiteboard", "Projector"]
+    },
+    {
+      "id": 10,
+      "name": "D-101",
+      "building": "D",
+      "floor": 1,
+      "capacity": 60,
+      "equipment": ["Projector", "Audio", "Video"]
+    },
+    {
+      "id": 11,
+      "name": "D-202",
+      "building": "D",
+      "floor": 2,
+      "capacity": 18,
+      "equipment": ["Whiteboard"]
+    },
+    {
+      "id": 12,
+      "name": "D-303",
+      "building": "D",
+      "floor": 3,
+      "capacity": 24,
+      "equipment": ["Projector", "Computers"]
+    }
+  ],
+  "bookings": [
+    {
+      "id": 1,
+      "roomId": 1,
+      "userId": 1,
+      "dateOffset": 1,
+      "startTime": "10:00",
+      "endTime": "11:30",
+      "status": "Active",
+      "comment": "Консультация"
+    },
+    {
+      "id": 2,
+      "roomId": 1,
+      "userId": 2,
+      "dateOffset": 1,
+      "startTime": "14:00",
+      "endTime": "15:30",
+      "status": "Active",
+      "comment": "Подготовка к семинару"
+    },
+    {
+      "id": 3,
+      "roomId": 4,
+      "userId": 2,
+      "dateOffset": 1,
+      "startTime": "09:00",
+      "endTime": "10:30",
+      "status": "Active",
+      "comment": "Собрание группы"
+    },
+    {
+      "id": 4,
+      "roomId": 7,
+      "userId": 3,
+      "dateOffset": 1,
+      "startTime": "12:00",
+      "endTime": "14:00",
+      "status": "Active",
+      "comment": "Встреча с деканом"
+    },
+    {
+      "id": 5,
+      "roomId": 1,
+      "userId": 1,
+      "dateOffset": 0,
+      "startTime": "15:00",
+      "endTime": "16:00",
+      "status": "Cancelled",
+      "comment": "Отменили"
+    },
+    {
+      "id": 6,
+      "roomId": 10,
+      "userId": 2,
+      "dateOffset": 2,
+      "startTime": "13:00",
+      "endTime": "15:00",
+      "status": "Active",
+      "comment": "Лекция"
+    },
+    {
+      "id": 7,
+      "roomId": 5,
+      "userId": 1,
+      "dateOffset": 1,
+      "startTime": "16:00",
+      "endTime": "17:30",
+      "status": "Active",
+      "comment": "Кружок"
+    }
+  ]
+}
