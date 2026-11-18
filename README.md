@@ -6,7 +6,7 @@ REST API и веб-интерфейс для бронирования аудит
 ## Стек
 
 | Слой           | Технологии                                         |
-|----------------|----------------------------------------------------|
+| -------------- | -------------------------------------------------- |
 | Backend        | .NET 9, ASP.NET Core Web API                       |
 | Данные         | EF Core 9, SQLite                                  |
 | Аутентификация | JWT (HS256), Microsoft.IdentityModel.JsonWebTokens |
@@ -27,7 +27,7 @@ dotnet run
 Приложение поднимается на `http://localhost:5242`:
 
 | Ресурс        | Адрес                                           |
-|---------------|-------------------------------------------------|
+| ------------- | ----------------------------------------------- |
 | Веб-интерфейс | `http://localhost:5242/`                        |
 | Swagger UI    | `http://localhost:5242/swagger`                 |
 | OpenAPI JSON  | `http://localhost:5242/swagger/v1/swagger.json` |
@@ -59,7 +59,7 @@ dotnet run --project tests/CampusFlow.Tests -- --filter BookingService
 `appsettings.json`:
 
 | Ключ                           | Значение по умолчанию            | Назначение                              |
-|--------------------------------|----------------------------------|-----------------------------------------|
+| ------------------------------ | -------------------------------- | --------------------------------------- |
 | `ConnectionStrings:CampusFlow` | `Data Source=campusflow.db`      | файл базы SQLite                        |
 | `Jwt:Issuer`                   | `CampusFlow`                     | издатель токена                         |
 | `Jwt:Audience`                 | `CampusFlow`                     | получатель токена                       |
@@ -77,8 +77,8 @@ dotnet run
 
 ## Аутентификация
 
-Алгоритм — HMAC-SHA256. Выпуск и проверка токенов выполняются через `JsonWebTokenHandler` из пакета
-`Microsoft.IdentityModel.JsonWebTokens`.
+Алгоритм — HMAC-SHA256. Выпуск и проверка токенов выполняются через пакеты
+`Microsoft.IdentityModel.JsonWebTokens` и `Microsoft.AspNetCore.Authentication.JwtBearer`.
 
 Вход:
 
@@ -92,7 +92,12 @@ Content-Type: application/json
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": { "id": 1, "login": "student1", "displayName": "Иван Студентов", "role": "student" }
+  "user": {
+    "id": 1,
+    "login": "student1",
+    "displayName": "Иван Студентов",
+    "role": "student"
+  }
 }
 ```
 
@@ -105,7 +110,7 @@ Authorization: Bearer <token>
 Состав токена:
 
 | Claim               | Содержимое                             |
-|---------------------|----------------------------------------|
+| ------------------- | -------------------------------------- |
 | `sub`               | идентификатор пользователя             |
 | `login`             | логин                                  |
 | `displayName`       | отображаемое имя                       |
@@ -121,7 +126,7 @@ Authorization: Bearer <token>
 Роли:
 
 | Действие                       | student | admin |
-|--------------------------------|---------|-------|
+| ------------------------------ | ------- | ----- |
 | Аудитории, свободные слоты     | да      | да    |
 | Создание брони                 | да      | да    |
 | Свои брони, отмена своей брони | да      | да    |
@@ -134,7 +139,7 @@ Authorization: Bearer <token>
 Базовый путь — `/api`. Формат обмена — JSON, UTF-8. Даты `YYYY-MM-DD`, время `HH:MM`.
 
 | Метод  | Путь                                                | Доступ | Успех     | Ошибки             |
-|--------|-----------------------------------------------------|--------|-----------|--------------------|
+| ------ | --------------------------------------------------- | ------ | --------- | ------------------ |
 | POST   | `/api/auth/login`                                   | все    | 200       | 400, 401           |
 | GET    | `/api/auth/me`                                      | токен  | 200       | 401                |
 | GET    | `/api/rooms`                                        | все    | 200       | 400                |
@@ -158,12 +163,17 @@ Authorization: Bearer <token>
 {
   "code": "BOOKING_CONFLICT",
   "message": "Аудитория уже забронирована на это время",
-  "details": { "roomId": 4, "date": "2026-11-15", "startTime": "14:00", "endTime": "15:00" }
+  "details": {
+    "roomId": 4,
+    "date": "2026-11-15",
+    "startTime": "14:00",
+    "endTime": "15:00"
+  }
 }
 ```
 
 | Код                  | HTTP |
-|----------------------|------|
+| -------------------- | ---- |
 | `VALIDATION_ERROR`   | 400  |
 | `UNAUTHORIZED`       | 401  |
 | `FORBIDDEN`          | 403  |
@@ -234,7 +244,7 @@ Content-Type: application/json
 ## Модель данных
 
 | Сущность  | Поля                                                                          |
-|-----------|-------------------------------------------------------------------------------|
+| --------- | ----------------------------------------------------------------------------- |
 | `User`    | `id`, `login`, `displayName`, `role`                                          |
 | `Room`    | `id`, `name`, `building`, `floor`, `capacity`, `equipment`                    |
 | `Booking` | `id`, `roomId`, `userId`, `date`, `startTime`, `endTime`, `status`, `comment` |
@@ -247,7 +257,7 @@ Content-Type: application/json
 Пароль пользователей равен логину.
 
 | Логин      | Имя                  | Роль    |
-|------------|----------------------|---------|
+| ---------- | -------------------- | ------- |
 | `student1` | Иван Студентов       | student |
 | `student2` | Мария Студентова     | student |
 | `admin`    | Администратор Пупкин | admin   |
